@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>True File | Upload to True Wallet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root { --ink:#172a3a; --muted:#708493; --teal:#087f8c; --teal-dark:#075e6a; --line:#dcebe7; }
+* { box-sizing:border-box; margin:0; padding:0; }
+body { min-height:100vh; color:var(--ink); font-family:"DM Sans",sans-serif; background:linear-gradient(135deg,#eaf6f2,#f8f4e9 55%,#d8eef2); }
+body:before, body:after { position:fixed; z-index:-1; width:24rem; height:24rem; border-radius:50%; content:""; opacity:.42; filter:blur(4px); animation:drift 15s ease-in-out infinite alternate; }
+body:before { top:-10rem; left:-8rem; background:#9edacf; } body:after { right:-10rem; bottom:-12rem; background:#f2d9a7; animation-delay:-5s; }
+.page { width:min(980px,calc(100% - 40px)); margin:auto; padding:28px 0 55px; animation:rise .65s ease both; }
+.topbar { display:flex; align-items:center; justify-content:space-between; } .brand { display:flex; align-items:center; gap:12px; } .mark { display:grid; width:42px; height:42px; place-items:center; border-radius:13px; color:white; font-size:20px; background:var(--teal); box-shadow:0 8px 18px #087f8c33; } .brand h1 { font:700 19px "Space Grotesk",sans-serif; } .brand p { color:var(--muted); font-size:12px; }
+.back { padding:10px 15px; border:1px solid #c8ded9; border-radius:10px; color:var(--ink); font-weight:600; text-decoration:none; background:#ffffffad; transition:.25s; } .back:hover { color:white; background:var(--teal); transform:translateX(-3px); }
+.layout { display:grid; grid-template-columns:1fr 1.1fr; gap:60px; align-items:center; min-height:650px; } .eyebrow { margin-bottom:14px; color:var(--teal); font-size:11px; font-weight:700; letter-spacing:1.8px; text-transform:uppercase; } h2 { margin-bottom:15px; font:600 42px/1.08 "Space Grotesk",sans-serif; } .copy { color:var(--muted); font-size:15px; line-height:1.65; } .features { display:grid; gap:13px; margin-top:32px; } .feature { display:flex; align-items:center; gap:12px; color:#4d6971; font-size:13px; } .feature i { display:grid; width:27px; height:27px; place-items:center; border-radius:50%; color:white; font-style:normal; background:var(--teal); animation:pulse 2.4s ease-in-out infinite; } .feature:nth-child(2) i { animation-delay:.35s; } .feature:nth-child(3) i { animation-delay:.7s; }
+.card { padding:31px; border:1px solid white; border-radius:20px; background:#ffffffb8; box-shadow:0 25px 70px #1c596022; backdrop-filter:blur(15px); } .card-header { margin-bottom:25px; } .card-header h3 { font:600 21px "Space Grotesk",sans-serif; } .card-header p { margin-top:5px; color:var(--muted); font-size:13px; }
+.success { margin-bottom:20px; padding:13px 15px; border:1px solid #b8e4d0; border-radius:10px; color:#196044; font-size:13px; background:#e5f7ed; animation:pop .4s ease both; }
+label { display:block; margin:17px 0 8px; color:#3d5963; font-size:13px; font-weight:700; } input, select { width:100%; padding:13px 14px; border:1px solid #cfe3de; border-radius:10px; outline:none; color:var(--ink); font:14px "DM Sans",sans-serif; background:white; transition:.2s; } input:focus, select:focus { border-color:var(--teal); box-shadow:0 0 0 4px #087f8c14; }
+.file-drop { display:flex; min-height:115px; align-items:center; justify-content:center; padding:18px; border:1px dashed #8cc8bf; border-radius:12px; color:var(--muted); text-align:center; cursor:pointer; background:#f5fcfa; transition:.25s ease; } .file-drop:hover, .file-drop.dragging { border-color:var(--teal); color:var(--teal-dark); background:#e5f7f2; transform:translateY(-2px); } .file-drop strong { display:block; margin-bottom:4px; color:var(--ink); font-size:14px; } .file-drop span { font-size:12px; } .file-icon { display:grid; width:36px; height:36px; margin:0 auto 8px; place-items:center; border-radius:50%; color:white; font-size:18px; background:var(--teal); animation:float 2.2s ease-in-out infinite; } .file-drop input { display:none; }
+button { width:100%; margin-top:26px; padding:14px; border:0; border-radius:10px; color:white; font:700 14px "DM Sans",sans-serif; cursor:pointer; background:var(--teal); transition:.25s; } button:hover { background:var(--teal-dark); transform:translateY(-2px); box-shadow:0 8px 18px #087f8c33; }
+@keyframes rise { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } } @keyframes pop { from { opacity:0; transform:scale(.97); } to { opacity:1; transform:scale(1); } } @keyframes drift { to { transform:translate(35px,25px) scale(1.08); } } @keyframes float { 50% { transform:translateY(-4px); } } @keyframes pulse { 50% { box-shadow:0 0 0 7px #087f8c00; } }
+@media (max-width:760px) { .page { width:calc(100% - 24px); padding-top:16px; } .layout { display:block; min-height:0; padding:65px 0 30px; } h2 { font-size:34px; } .features { margin:23px 0 30px; } .card { padding:23px; } }
+</style>
+</head>
+<body>
+<main class="page">
+<nav class="topbar"><div class="brand"><div class="mark">+</div><div><h1>TRUE FILE</h1><p>Personal document wallet</p></div></div><a class="back" href="javascript:history.back()">&larr; Back</a></nav>
+<section class="layout"><div><div class="eyebrow">True Wallet</div><h2>Keep your documents close.</h2><p class="copy">Upload a personal document to your secure True Wallet and access it whenever you need it.</p><div class="features"><div class="feature"><i>1</i> Store important documents securely</div><div class="feature"><i>2</i> Find them from your wallet anytime</div><div class="feature"><i>3</i> Keep your personal records organized</div></div></div>
+<section class="card"><div class="card-header"><h3>Upload to True Wallet</h3><p>Add a document to your personal collection.</p></div>{% if success %}<div class="success">{{ success }}</div>{% endif %}<form method="POST" enctype="multipart/form-data">{% csrf_token %}<label for="document_name">Document name</label><input id="document_name" type="text" name="document_name" placeholder="Enter document name" required><label for="document_type">Document type</label><select id="document_type" name="document_type"><option>Aadhaar Card</option><option>PAN Card</option><option>Driving Licence</option><option>Passport</option><option>Degree Certificate</option><option>Marksheet</option><option>Birth Certificate</option><option>Transfer Certificate</option><option>RESUME</option><option>Other</option></select><label for="document">Select document</label><label class="file-drop" id="fileDrop" for="document"><span><i class="file-icon">+</i><strong id="fileTitle">Choose a file</strong><span id="fileHint">Click to browse or drag and drop here</span></span><input id="document" type="file" name="document" required></label><button type="submit">Upload to True Wallet</button></form></section></section>
+</main>
+<script>
+const documentInput = document.getElementById("document");
+const fileDrop = document.getElementById("fileDrop");
+documentInput.addEventListener("change", function () { const selected = this.files[0]; if (selected) { document.getElementById("fileTitle").textContent = selected.name; document.getElementById("fileHint").textContent = "Ready to upload"; fileDrop.classList.add("dragging"); } });
+["dragenter", "dragover"].forEach(function (eventName) { fileDrop.addEventListener(eventName, function (event) { event.preventDefault(); fileDrop.classList.add("dragging"); }); });
+["dragleave", "drop"].forEach(function (eventName) { fileDrop.addEventListener(eventName, function (event) { event.preventDefault(); fileDrop.classList.remove("dragging"); }); });
+</script>
+</body>
+</html>

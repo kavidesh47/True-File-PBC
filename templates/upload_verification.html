@@ -1,0 +1,2643 @@
+{% load static %}
+
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+```
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>TRUEFILE - Verify Document</title>
+
+<link rel="preconnect"
+      href="https://fonts.googleapis.com">
+
+<link rel="preconnect"
+      href="https://fonts.gstatic.com"
+      crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Outfit:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet">
+```
+
+<style>
+
+/* =========================================================
+   ROOT
+========================================================= */
+
+:root {
+
+    --navy: #1E3A8A;
+    --violet: #6A11CB;
+    --blue: #2563EB;
+
+    --green: #16A34A;
+    --red: #DC2626;
+
+    --ink: #1f2333;
+    --muted: #6b7280;
+    --line: #e7e8f2;
+
+    --surface: rgba(255,255,255,0.92);
+
+    --shadow:
+        0 24px 60px -24px
+        rgba(30,20,80,0.35);
+}
+
+
+/* =========================================================
+   RESET
+========================================================= */
+
+* {
+
+    margin: 0;
+    padding: 0;
+
+    box-sizing: border-box;
+
+}
+
+
+html,
+body {
+
+    width: 100%;
+    min-height: 100%;
+
+}
+
+
+body {
+
+    font-family:
+        'Outfit',
+        Arial,
+        sans-serif;
+
+    color: var(--ink);
+
+    min-height: 100vh;
+
+    overflow-x: hidden;
+
+    position: relative;
+
+    background: #eef1f7;
+
+}
+
+
+h1,
+h2,
+h3 {
+
+    font-family:
+        'Fraunces',
+        serif;
+
+    font-weight: 600;
+
+}
+
+
+a {
+
+    color: inherit;
+
+    text-decoration: none;
+
+}
+
+
+button,
+input {
+
+    font-family: inherit;
+
+}
+
+
+/* =========================================================
+   BACKGROUND
+========================================================= */
+
+#bgCanvas {
+
+    position: fixed;
+
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    z-index: -2;
+
+    filter:
+        blur(70px)
+        saturate(1.25);
+
+}
+
+
+.grain {
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: -1;
+
+    pointer-events: none;
+
+    background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+
+    mix-blend-mode: overlay;
+
+}
+
+
+/* =========================================================
+   TOP BAR
+========================================================= */
+
+.topbar {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding:
+        22px
+        clamp(20px,4vw,50px);
+
+    opacity: 0;
+
+    animation:
+        fadeDown .7s
+        cubic-bezier(.22,1,.36,1)
+        forwards;
+
+}
+
+
+@keyframes fadeDown {
+
+    from {
+
+        opacity: 0;
+
+        transform:
+            translateY(-16px);
+
+    }
+
+    to {
+
+        opacity: 1;
+
+        transform:
+            translateY(0);
+
+    }
+
+}
+
+
+.brand {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+}
+
+
+.brand .mark {
+
+    width: 42px;
+    height: 42px;
+
+    border-radius: 12px;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--navy),
+            var(--violet)
+        );
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    color: white;
+
+    font-family:
+        'Fraunces',
+        serif;
+
+    font-style: italic;
+
+    font-weight: 600;
+
+    font-size: 18px;
+
+    box-shadow:
+        0 10px 22px -8px
+        rgba(106,17,203,.55);
+
+}
+
+
+.brand h1 {
+
+    font-size: 20px;
+
+    color: white;
+
+}
+
+
+.brand .sub {
+
+    font-size: 12px;
+
+    color:
+        rgba(255,255,255,.7);
+
+    margin-top: 1px;
+
+}
+
+
+.back-link {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    color:
+        rgba(255,255,255,.9);
+
+    font-size: 13.5px;
+
+    background:
+        rgba(255,255,255,.12);
+
+    border:
+        1px solid
+        rgba(255,255,255,.25);
+
+    padding:
+        9px 16px;
+
+    border-radius: 999px;
+
+    backdrop-filter:
+        blur(10px);
+
+    transition:
+        background .2s ease,
+        transform .2s ease;
+
+}
+
+
+.back-link:hover {
+
+    background:
+        rgba(255,255,255,.2);
+
+    transform:
+        translateX(-3px);
+
+}
+
+
+/* =========================================================
+   MAIN STAGE
+========================================================= */
+
+.stage {
+
+    position: relative;
+
+    z-index: 1;
+
+    min-height:
+        calc(100vh - 90px);
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding:
+        30px 24px 60px;
+
+}
+
+
+/* =========================================================
+   CARD
+========================================================= */
+
+.card {
+
+    width: 100%;
+
+    max-width: 520px;
+
+    background:
+        var(--surface);
+
+    backdrop-filter:
+        blur(16px);
+
+    border:
+        1px solid
+        rgba(255,255,255,.7);
+
+    border-radius: 26px;
+
+    padding:
+        44px 40px 38px;
+
+    box-shadow:
+        var(--shadow);
+
+    text-align: center;
+
+    opacity: 0;
+
+    transform:
+        translateY(26px)
+        scale(.97);
+
+    animation:
+        cardRise .8s
+        cubic-bezier(.22,1,.36,1)
+        forwards .1s;
+
+}
+
+
+@keyframes cardRise {
+
+    to {
+
+        opacity: 1;
+
+        transform:
+            translateY(0)
+            scale(1);
+
+    }
+
+}
+
+
+/* =========================================================
+   SEAL
+========================================================= */
+
+.seal-badge {
+
+    width: 86px;
+    height: 86px;
+
+    margin:
+        0 auto 18px;
+
+    border-radius: 50%;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--navy),
+            var(--violet)
+        );
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    box-shadow:
+        0 16px 30px -12px
+        rgba(106,17,203,.5);
+
+    animation:
+        gentleFloat
+        3.4s
+        ease-in-out
+        infinite;
+
+}
+
+
+.seal-badge svg {
+
+    width: 36px;
+    height: 36px;
+
+    color: white;
+
+}
+
+
+@keyframes gentleFloat {
+
+    0%,
+    100% {
+
+        transform:
+            translateY(0);
+
+    }
+
+    50% {
+
+        transform:
+            translateY(-8px);
+
+    }
+
+}
+
+
+.title {
+
+    font-size: 24px;
+
+    margin-bottom: 6px;
+
+}
+
+
+.subtitle {
+
+    font-size: 13.5px;
+
+    color: var(--muted);
+
+    margin-bottom: 28px;
+
+}
+
+
+/* =========================================================
+   DROPZONE
+========================================================= */
+
+.dropzone {
+
+    border:
+        2px dashed
+        var(--line);
+
+    border-radius: 18px;
+
+    padding:
+        40px 20px;
+
+    background:
+        rgba(255,255,255,.5);
+
+    cursor: pointer;
+
+    transition:
+        border-color .25s ease,
+        background .25s ease,
+        transform .2s ease;
+
+    margin-bottom: 22px;
+
+}
+
+
+.dropzone:hover,
+.dropzone.drag {
+
+    border-color:
+        var(--violet);
+
+    background:
+        rgba(106,17,203,.05);
+
+    transform:
+        scale(1.01);
+
+}
+
+
+.up-icon {
+
+    width: 56px;
+    height: 56px;
+
+    margin:
+        0 auto 14px;
+
+    border-radius: 50%;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(30,58,138,.1),
+            rgba(106,17,203,.1)
+        );
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    animation:
+        floatUp
+        3s
+        ease-in-out
+        infinite;
+
+}
+
+
+.up-icon svg {
+
+    width: 24px;
+    height: 24px;
+
+    color:
+        var(--violet);
+
+}
+
+
+@keyframes floatUp {
+
+    0%,
+    100% {
+
+        transform:
+            translateY(0);
+
+    }
+
+    50% {
+
+        transform:
+            translateY(-7px);
+
+    }
+
+}
+
+
+.dropzone h3 {
+
+    font-size: 15.5px;
+
+    margin-bottom: 4px;
+
+}
+
+
+.dropzone p {
+
+    font-size: 12.5px;
+
+    color:
+        var(--muted);
+
+}
+
+
+.browse {
+
+    color:
+        var(--violet);
+
+    font-weight: 600;
+
+}
+
+
+/* =========================================================
+   FILE CHIP
+========================================================= */
+
+.file-chip {
+
+    display: none;
+
+    align-items: center;
+
+    gap: 12px;
+
+    background: white;
+
+    border:
+        1px solid
+        var(--line);
+
+    border-radius: 14px;
+
+    padding:
+        12px 16px;
+
+    margin-bottom: 22px;
+
+    text-align: left;
+
+}
+
+
+.file-chip.show {
+
+    display: flex;
+
+}
+
+
+.fi {
+
+    width: 38px;
+    height: 38px;
+
+    border-radius: 10px;
+
+    flex-shrink: 0;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--navy),
+            var(--violet)
+        );
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    color: white;
+
+}
+
+
+.fi svg {
+
+    width: 17px;
+    height: 17px;
+
+}
+
+
+.meta {
+
+    flex: 1;
+
+    min-width: 0;
+
+}
+
+
+.name {
+
+    font-size: 13.5px;
+
+    font-weight: 500;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+}
+
+
+.size {
+
+    font-size: 11px;
+
+    color:
+        var(--muted);
+
+    margin-top: 2px;
+
+}
+
+
+.remove {
+
+    border: none;
+
+    background:
+        transparent;
+
+    color:
+        var(--muted);
+
+    font-size: 18px;
+
+    padding:
+        4px 8px;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+}
+
+
+.remove:hover {
+
+    background:
+        #f1f0fa;
+
+    color:
+        var(--red);
+
+}
+
+
+/* =========================================================
+   VERIFY BUTTON
+========================================================= */
+
+.btn-verify {
+
+    width: 100%;
+
+    padding: 16px;
+
+    border: none;
+
+    border-radius: 14px;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--navy),
+            var(--violet)
+        );
+
+    color: white;
+
+    font-size: 16px;
+
+    font-weight: 600;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 10px;
+
+    position: relative;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 16px 32px -14px
+        rgba(106,17,203,.5);
+
+    transition:
+        transform .18s ease,
+        box-shadow .25s ease,
+        opacity .3s ease;
+
+}
+
+
+.btn-verify:hover {
+
+    box-shadow:
+        0 20px 40px -14px
+        rgba(106,17,203,.65);
+
+}
+
+
+.btn-verify:active {
+
+    transform:
+        scale(.97);
+
+}
+
+
+.btn-verify:disabled {
+
+    opacity: .7;
+
+    cursor:
+        not-allowed;
+
+}
+
+
+.btn-verify .label {
+
+    transition:
+        opacity .2s ease;
+
+}
+
+
+.btn-verify.loading .label {
+
+    opacity: 0;
+
+}
+
+
+.spinner {
+
+    position: absolute;
+
+    width: 20px;
+    height: 20px;
+
+    border-radius: 50%;
+
+    border:
+        2.5px solid
+        rgba(255,255,255,.35);
+
+    border-top-color:
+        white;
+
+    opacity: 0;
+
+    transform:
+        scale(.6);
+
+}
+
+
+.btn-verify.loading .spinner {
+
+    opacity: 1;
+
+    transform:
+        scale(1);
+
+    animation:
+        spin .7s
+        linear
+        infinite;
+
+}
+
+
+@keyframes spin {
+
+    to {
+
+        transform:
+            rotate(360deg)
+            scale(1);
+
+    }
+
+}
+
+
+/* =========================================================
+   SCANNING
+========================================================= */
+
+.scan-block {
+
+    display: none;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    padding:
+        18px 0 6px;
+
+}
+
+
+.scan-block.show {
+
+    display: flex;
+
+}
+
+
+.scan-ring-wrap {
+
+    position: relative;
+
+    width: 110px;
+    height: 110px;
+
+    margin-bottom: 20px;
+
+}
+
+
+.scan-ring-wrap > svg {
+
+    width: 100%;
+    height: 100%;
+
+    transform:
+        rotate(-90deg);
+
+}
+
+
+.scan-bg {
+
+    fill: none;
+
+    stroke:
+        var(--line);
+
+    stroke-width: 6;
+
+}
+
+
+.scan-fg {
+
+    fill: none;
+
+    stroke:
+        url(#waxGrad);
+
+    stroke-width: 6;
+
+    stroke-linecap: round;
+
+    stroke-dasharray: 283;
+
+    stroke-dashoffset: 283;
+
+    animation:
+        scanProgress
+        1.6s
+        cubic-bezier(.22,1,.36,1)
+        forwards;
+
+}
+
+
+@keyframes scanProgress {
+
+    to {
+
+        stroke-dashoffset: 40;
+
+    }
+
+}
+
+
+.doc-mid {
+
+    position: absolute;
+
+    inset: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+}
+
+
+.doc-mid svg {
+
+    width: 32px;
+    height: 32px;
+
+    color:
+        var(--violet);
+
+    animation:
+        scanPulse
+        1.2s
+        ease-in-out
+        infinite;
+
+}
+
+
+@keyframes scanPulse {
+
+    0%,
+    100% {
+
+        opacity: .5;
+
+    }
+
+    50% {
+
+        opacity: 1;
+
+    }
+
+}
+
+
+.scan-block h3 {
+
+    font-size: 15.5px;
+
+}
+
+
+.scan-block p {
+
+    font-size: 12.5px;
+
+    color:
+        var(--muted);
+
+    margin-top: 4px;
+
+}
+
+
+/* =========================================================
+   RESULT
+========================================================= */
+
+.result-block {
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    padding:
+        10px 0 4px;
+
+}
+
+
+.result-badge {
+
+    width: 80px;
+    height: 80px;
+
+    border-radius: 50%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    margin-bottom: 16px;
+
+    animation:
+        popIn
+        .5s
+        cubic-bezier(.34,1.56,.64,1)
+        forwards;
+
+}
+
+
+.result-badge.ok {
+
+    background:
+        linear-gradient(
+            135deg,
+            #dcfce7,
+            #bbf7d0
+        );
+
+}
+
+
+.result-badge.fail {
+
+    background:
+        linear-gradient(
+            135deg,
+            #fee2e2,
+            #fecaca
+        );
+
+}
+
+
+.result-badge svg {
+
+    width: 34px;
+    height: 34px;
+
+}
+
+
+.result-badge.ok svg {
+
+    color:
+        var(--green);
+
+}
+
+
+.result-badge.fail svg {
+
+    color:
+        var(--red);
+
+}
+
+
+@keyframes popIn {
+
+    from {
+
+        transform:
+            scale(.5);
+
+        opacity: 0;
+
+    }
+
+    to {
+
+        transform:
+            scale(1);
+
+        opacity: 1;
+
+    }
+
+}
+
+
+.result-block h3 {
+
+    font-size: 19px;
+
+}
+
+
+.result-block p {
+
+    font-size: 13px;
+
+    color:
+        var(--muted);
+
+    margin-top: 6px;
+
+    max-width: 36ch;
+
+}
+
+
+.result-hash {
+
+    margin-top: 14px;
+
+    font-size: 11px;
+
+    color:
+        var(--muted);
+
+    background:
+        #f1f0fa;
+
+    padding:
+        8px 14px;
+
+    border-radius: 9px;
+
+    font-family:
+        monospace;
+
+    word-break:
+        break-all;
+
+}
+
+
+/* =========================================================
+   RESULT BUTTONS
+========================================================= */
+
+.result-actions {
+
+    display: flex;
+
+    gap: 10px;
+
+    margin-top: 24px;
+
+    width: 100%;
+
+}
+
+
+.result-actions a {
+
+    flex: 1;
+
+    padding: 12px;
+
+    border-radius: 11px;
+
+    font-size: 13.5px;
+
+    font-weight: 600;
+
+    text-align: center;
+
+}
+
+
+.btn-secondary {
+
+    background:
+        #f1f0fa;
+
+    color:
+        #514f66;
+
+}
+
+
+.btn-primary-sm {
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--navy),
+            var(--violet)
+        );
+
+    color:
+        white;
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+
+    .topbar {
+
+        padding: 18px;
+
+    }
+
+
+    .brand .sub {
+
+        display: none;
+
+    }
+
+
+    .back-link {
+
+        padding:
+            8px 12px;
+
+        font-size: 12px;
+
+    }
+
+
+    .stage {
+
+        padding:
+            20px 15px 40px;
+
+    }
+
+
+    .card {
+
+        padding:
+            32px 22px 28px;
+
+        border-radius: 22px;
+
+    }
+
+
+    .result-actions {
+
+        flex-direction: column;
+
+    }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- =====================================================
+     BACKGROUND
+===================================================== -->
+
+<canvas id="bgCanvas"></canvas>
+
+<div class="grain"></div>
+
+<!-- =====================================================
+     SVG GRADIENT
+===================================================== -->
+
+<svg width="0"
+  height="0"
+  style="position:absolute">
+
+```
+<defs>
+
+    <linearGradient
+        id="waxGrad"
+        x1="0%"
+        y1="0%"
+        x2="100%"
+        y2="100%">
+
+        <stop
+            offset="0%"
+            stop-color="#1E3A8A"/>
+
+        <stop
+            offset="100%"
+            stop-color="#6A11CB"/>
+
+    </linearGradient>
+
+</defs>
+```
+
+</svg>
+
+<!-- =====================================================
+     TOP BAR
+===================================================== -->
+
+<div class="topbar">
+
+```
+<div class="brand">
+
+    <span class="mark">
+        tf
+    </span>
+
+
+    <div>
+
+        <h1>
+            TRUEFILE
+        </h1>
+
+        <div class="sub">
+            Document Verification
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- IMPORTANT:
+     Direct URL used here instead of
+     {% url 'admin_dashboard' %}
+-->
+
+<a href="/admin-dashboard/"
+   class="back-link">
+
+    <svg width="14"
+         height="14"
+         viewBox="0 0 24 24"
+         fill="none"
+         stroke="currentColor"
+         stroke-width="2">
+
+        <path d="M19 12H5"/>
+
+        <path d="M12 19l-7-7 7-7"/>
+
+    </svg>
+
+    Back to Dashboard
+
+</a>
+```
+
+</div>
+
+<!-- =====================================================
+     MAIN
+===================================================== -->
+
+<div class="stage">
+
+```
+<div class="card">
+
+
+    <!-- =================================================
+         UPLOAD FORM
+
+         IMPORTANT:
+         We use the direct URL
+         /upload-verification/
+         instead of Django URL reverse.
+    ================================================== -->
+
+    <form method="POST"
+          action="/upload-verification/"
+          enctype="multipart/form-data"
+          id="uploadForm"
+          {% if result %}style="display:none;"{% endif %}>
+
+
+        {% csrf_token %}
+
+
+        <!-- SEAL ICON -->
+
+        <div class="seal-badge">
+
+            <svg viewBox="0 0 24 24"
+                 fill="none"
+                 stroke="currentColor"
+                 stroke-width="2">
+
+                <circle
+                    cx="12"
+                    cy="12"
+                    r="10"/>
+
+                <path
+                    d="M9 12l2 2 4-4"/>
+
+            </svg>
+
+        </div>
+
+
+        <h1 class="title">
+            Verify Document
+        </h1>
+
+
+        <p class="subtitle">
+            Upload a file to check its seal and integrity.
+        </p>
+
+
+        <!-- =================================================
+             DROPZONE
+        ================================================== -->
+
+        <div class="dropzone"
+             id="dropzone">
+
+
+            <div class="up-icon">
+
+                <svg viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2">
+
+                    <path d="M12 16V4"/>
+
+                    <path d="M12 4l-4 4"/>
+
+                    <path d="M12 4l4 4"/>
+
+                    <path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/>
+
+                </svg>
+
+            </div>
+
+
+            <h3>
+                Drag & drop a file
+            </h3>
+
+
+            <p>
+
+                or
+
+                <span class="browse">
+                    click to browse
+                </span>
+
+                · Word documents (.DOC, .DOCX) up to 20MB
+
+            </p>
+
+
+        </div>
+
+
+        <!-- FILE INPUT -->
+
+        <input
+            type="file"
+            name="document"
+            id="fileInput"
+            accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.jpg,.jpeg,.png,.gif,.webp,.csv,.json,.xml,.rtf,.odt,.ods,.odp"
+            hidden
+            required>
+
+
+        <!-- =================================================
+             SELECTED FILE
+        ================================================== -->
+
+        <div class="file-chip"
+             id="fileChip">
+
+
+            <div class="fi">
+
+                <svg viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2">
+
+                    <path
+                        d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z"/>
+
+                    <path
+                        d="M14 3v5h5"/>
+
+                </svg>
+
+            </div>
+
+
+            <div class="meta">
+
+                <div class="name"
+                     id="fileName">
+                    —
+                </div>
+
+                <div class="size"
+                     id="fileSize">
+                    —
+                </div>
+
+            </div>
+
+
+            <button
+                type="button"
+                class="remove"
+                id="removeFile">
+
+                ✕
+
+            </button>
+
+        </div>
+
+
+        <!-- =================================================
+             SCANNING
+        ================================================== -->
+
+        <div class="scan-block"
+             id="scanBlock">
+
+
+            <div class="scan-ring-wrap">
+
+
+                <svg viewBox="0 0 100 100">
+
+                    <circle
+                        class="scan-bg"
+                        cx="50"
+                        cy="50"
+                        r="45"/>
+
+
+                    <circle
+                        class="scan-fg"
+                        cx="50"
+                        cy="50"
+                        r="45"/>
+
+                </svg>
+
+
+                <div class="doc-mid">
+
+                    <svg viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="2">
+
+                        <path
+                            d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z"/>
+
+                        <path
+                            d="M14 3v5h5"/>
+
+                    </svg>
+
+                </div>
+
+
+            </div>
+
+
+            <h3>
+                Checking seal integrity...
+            </h3>
+
+
+            <p>
+                Matching hash and signature against TRUEFILE records.
+            </p>
+
+
+        </div>
+
+
+        <!-- =================================================
+             VERIFY BUTTON
+        ================================================== -->
+
+        <button
+            type="submit"
+            class="btn-verify"
+            id="verifyBtn">
+
+
+            <span class="label">
+                Verify Document
+            </span>
+
+
+            <span class="spinner"></span>
+
+
+        </button>
+
+
+    </form>
+
+
+    <!-- =====================================================
+         RESULT
+    ===================================================== -->
+
+    {% if result %}
+
+
+    <div class="result-block">
+
+
+        {% if result == "verified" %}
+
+
+        <!-- SUCCESS -->
+
+        <div class="result-badge ok">
+
+            <svg viewBox="0 0 24 24"
+                 fill="none"
+                 stroke="currentColor"
+                 stroke-width="3"
+                 stroke-linecap="round"
+                 stroke-linejoin="round">
+
+                <path
+                    d="M20 6L9 17l-5-5"/>
+
+            </svg>
+
+        </div>
+
+
+        <h3>
+            Document verified
+        </h3>
+
+
+        <p>
+            {{ result_message|default:"Seal matches, no tampering detected." }}
+        </p>
+
+
+        {% if document_hash %}
+
+        <div class="result-hash">
+
+            SHA256:
+            {{ document_hash }}
+
+        </div>
+
+        {% endif %}
+
+
+        {% else %}
+
+
+        <!-- FAILED -->
+
+        <div class="result-badge fail">
+
+            <svg viewBox="0 0 24 24"
+                 fill="none"
+                 stroke="currentColor"
+                 stroke-width="3"
+                 stroke-linecap="round"
+                 stroke-linejoin="round">
+
+                <path
+                    d="M18 6L6 18"/>
+
+                <path
+                    d="M6 6l12 12"/>
+
+            </svg>
+
+        </div>
+
+
+        <h3>
+            Verification failed
+        </h3>
+
+
+        <p>
+            {{ result_message|default:"This document's seal could not be matched or has been altered." }}
+        </p>
+
+
+        {% endif %}
+
+
+        <!-- =================================================
+             RESULT BUTTONS
+        ================================================== -->
+
+        <div class="result-actions">
+
+
+            <!-- IMPORTANT:
+                 Direct URL used instead of
+                 {% url 'verify_document' %}
+            -->
+
+            <a href="/upload-verification/"
+               class="btn-secondary">
+
+                Verify another
+
+            </a>
+
+
+            <!-- Direct dashboard URL -->
+
+            <a href="/admin-dashboard/"
+               class="btn-primary-sm">
+
+                Back to dashboard
+
+            </a>
+
+
+        </div>
+
+
+    </div>
+
+
+    {% endif %}
+
+
+</div>
+```
+
+</div>
+
+<script>
+
+/* =========================================================
+   BACKGROUND ANIMATION
+========================================================= */
+
+const canvas =
+    document.getElementById(
+        "bgCanvas"
+    );
+
+
+if (canvas) {
+
+    const ctx =
+        canvas.getContext("2d");
+
+
+    let width = 0;
+    let height = 0;
+    let dpr = 1;
+
+
+    function resizeCanvas() {
+
+        dpr =
+            Math.min(
+                window.devicePixelRatio || 1,
+                2
+            );
+
+
+        width =
+            window.innerWidth;
+
+        height =
+            window.innerHeight;
+
+
+        canvas.width =
+            width * dpr;
+
+        canvas.height =
+            height * dpr;
+
+
+        canvas.style.width =
+            width + "px";
+
+        canvas.style.height =
+            height + "px";
+
+
+        ctx.setTransform(
+            dpr,
+            0,
+            0,
+            dpr,
+            0,
+            0
+        );
+
+    }
+
+
+    resizeCanvas();
+
+
+    window.addEventListener(
+        "resize",
+        resizeCanvas
+    );
+
+
+    const palette = [
+
+        "#1E3A8A",
+        "#6A11CB",
+        "#2563EB",
+        "#8B5CF6",
+        "#1e293b"
+
+    ];
+
+
+    const blobs =
+        Array.from(
+            {length: 6}
+        ).map(
+            (_, index) => ({
+
+                x:
+                    Math.random()
+                    * width,
+
+                y:
+                    Math.random()
+                    * height,
+
+                r:
+                    180 +
+                    Math.random()
+                    * 240,
+
+                color:
+                    palette[
+                        index %
+                        palette.length
+                    ],
+
+                vx:
+                    (Math.random()-.5)
+                    * .22,
+
+                vy:
+                    (Math.random()-.5)
+                    * .22,
+
+                phase:
+                    Math.random()
+                    * Math.PI
+                    * 2
+
+            })
+        );
+
+
+    const reducedMotion =
+        window.matchMedia(
+            "(prefers-reduced-motion: reduce)"
+        ).matches;
+
+
+    function draw(time) {
+
+        ctx.fillStyle =
+            "#eef1f7";
+
+
+        ctx.fillRect(
+            0,
+            0,
+            width,
+            height
+        );
+
+
+        blobs.forEach(
+            blob => {
+
+
+                if (!reducedMotion) {
+
+                    blob.x += blob.vx;
+                    blob.y += blob.vy;
+
+
+                    if (
+                        blob.x <
+                        -blob.r
+                    ) {
+
+                        blob.x =
+                            width +
+                            blob.r;
+
+                    }
+
+
+                    if (
+                        blob.x >
+                        width +
+                        blob.r
+                    ) {
+
+                        blob.x =
+                            -blob.r;
+
+                    }
+
+
+                    if (
+                        blob.y <
+                        -blob.r
+                    ) {
+
+                        blob.y =
+                            height +
+                            blob.r;
+
+                    }
+
+
+                    if (
+                        blob.y >
+                        height +
+                        blob.r
+                    ) {
+
+                        blob.y =
+                            -blob.r;
+
+                    }
+
+                }
+
+
+                const pulse =
+                    reducedMotion
+                    ? 1
+                    :
+                    1 +
+                    Math.sin(
+                        time /
+                        1900 +
+                        blob.phase
+                    ) * .07;
+
+
+                const gradient =
+                    ctx.createRadialGradient(
+                        blob.x,
+                        blob.y,
+                        0,
+                        blob.x,
+                        blob.y,
+                        blob.r *
+                        pulse
+                    );
+
+
+                gradient.addColorStop(
+                    0,
+                    blob.color +
+                    "55"
+                );
+
+
+                gradient.addColorStop(
+                    1,
+                    blob.color +
+                    "00"
+                );
+
+
+                ctx.fillStyle =
+                    gradient;
+
+
+                ctx.beginPath();
+
+
+                ctx.arc(
+                    blob.x,
+                    blob.y,
+                    blob.r * pulse,
+                    0,
+                    Math.PI * 2
+                );
+
+
+                ctx.fill();
+
+
+            }
+        );
+
+
+        if (!reducedMotion) {
+
+            requestAnimationFrame(
+                draw
+            );
+
+        }
+
+    }
+
+
+    requestAnimationFrame(
+        draw
+    );
+
+}
+
+
+/* =========================================================
+   FILE UPLOAD
+========================================================= */
+
+const dropzone =
+    document.getElementById(
+        "dropzone"
+    );
+
+
+const fileInput =
+    document.getElementById(
+        "fileInput"
+    );
+
+
+const fileChip =
+    document.getElementById(
+        "fileChip"
+    );
+
+
+const fileName =
+    document.getElementById(
+        "fileName"
+    );
+
+
+const fileSize =
+    document.getElementById(
+        "fileSize"
+    );
+
+
+const removeFile =
+    document.getElementById(
+        "removeFile"
+    );
+
+
+function formatFileSize(bytes) {
+
+    if (bytes < 1024) {
+
+        return bytes + " B";
+
+    }
+
+
+    if (
+        bytes <
+        1024 * 1024
+    ) {
+
+        return (
+            bytes / 1024
+        ).toFixed(1)
+        + " KB";
+
+    }
+
+
+    return (
+        bytes /
+        (1024 * 1024)
+    ).toFixed(2)
+    + " MB";
+
+}
+
+
+function showFile(file) {
+
+    if (!file) {
+
+        return;
+
+    }
+
+
+    const maxSize =
+        20 *
+        1024 *
+        1024;
+
+
+    if (
+        file.size >
+        maxSize
+    ) {
+
+        alert(
+            "File size must be less than 20 MB."
+        );
+
+
+        fileInput.value =
+            "";
+
+
+        return;
+
+    }
+
+
+    const allowedExtensions = [
+    ".pdf",
+    ".doc",
+    ".docx",
+    ".xls",
+    ".xlsx",
+    ".ppt",
+    ".pptx",
+    ".txt",
+    ".jpg",
+    ".jpeg",
+    ".png",
+    ".gif",
+    ".webp",
+    ".csv",
+    ".json",
+    ".xml",
+    ".rtf",
+    ".odt",
+    ".ods",
+    ".odp"
+];
+
+
+const fileExtension =
+    "." + file.name.split(".").pop().toLowerCase();
+
+if (!allowedExtensions.includes(fileExtension)) {
+
+    alert(
+        "Unsupported file type. Please upload a valid document."
+    );
+
+    fileInput.value = "";
+
+    return;
+}
+
+
+    fileName.textContent =
+        file.name;
+
+
+    fileSize.textContent =
+        formatFileSize(
+            file.size
+        );
+
+
+    fileChip.classList.add(
+        "show"
+    );
+
+
+    dropzone.style.display =
+        "none";
+
+}
+
+
+/* =========================================================
+   CLICK UPLOAD
+========================================================= */
+
+if (
+    dropzone &&
+    fileInput
+) {
+
+    dropzone.addEventListener(
+        "click",
+        () => {
+
+            fileInput.click();
+
+        }
+    );
+
+
+    fileInput.addEventListener(
+        "change",
+        () => {
+
+            if (
+                fileInput.files &&
+                fileInput.files.length
+            ) {
+
+                showFile(
+                    fileInput.files[0]
+                );
+
+            }
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   DRAG ENTER
+========================================================= */
+
+if (dropzone) {
+
+    [
+        "dragenter",
+        "dragover"
+    ].forEach(
+        eventName => {
+
+            dropzone.addEventListener(
+                eventName,
+                event => {
+
+                    event.preventDefault();
+
+                    event.stopPropagation();
+
+                    dropzone.classList.add(
+                        "drag"
+                    );
+
+                }
+            );
+
+        }
+    );
+
+
+    [
+        "dragleave",
+        "dragend"
+    ].forEach(
+        eventName => {
+
+            dropzone.addEventListener(
+                eventName,
+                event => {
+
+                    event.preventDefault();
+
+                    event.stopPropagation();
+
+                    dropzone.classList.remove(
+                        "drag"
+                    );
+
+                }
+            );
+
+        }
+    );
+
+
+    /* =====================================================
+       DROP FILE
+    ===================================================== */
+
+    dropzone.addEventListener(
+        "drop",
+        event => {
+
+            event.preventDefault();
+
+            event.stopPropagation();
+
+
+            dropzone.classList.remove(
+                "drag"
+            );
+
+
+            const files =
+                event.dataTransfer.files;
+
+
+            if (
+                files &&
+                files.length > 0
+            ) {
+
+                try {
+
+                    const dataTransfer =
+                        new DataTransfer();
+
+
+                    dataTransfer.items.add(
+                        files[0]
+                    );
+
+
+                    fileInput.files =
+                        dataTransfer.files;
+
+                }
+                catch (error) {
+
+                    console.error(
+                        error
+                    );
+
+                }
+
+
+                showFile(
+                    files[0]
+                );
+
+            }
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   REMOVE FILE
+========================================================= */
+
+if (removeFile) {
+
+    removeFile.addEventListener(
+        "click",
+        event => {
+
+            event.preventDefault();
+
+            event.stopPropagation();
+
+
+            fileInput.value =
+                "";
+
+
+            fileChip.classList.remove(
+                "show"
+            );
+
+
+            dropzone.style.display =
+                "block";
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   FORM SUBMISSION
+========================================================= */
+
+const uploadForm =
+    document.getElementById(
+        "uploadForm"
+    );
+
+
+const verifyBtn =
+    document.getElementById(
+        "verifyBtn"
+    );
+
+
+const scanBlock =
+    document.getElementById(
+        "scanBlock"
+    );
+
+
+if (
+    uploadForm &&
+    verifyBtn &&
+    scanBlock
+) {
+
+    uploadForm.addEventListener(
+        "submit",
+        event => {
+
+
+            /* No file */
+
+            if (
+                !fileInput ||
+                !fileInput.files ||
+                !fileInput.files.length
+            ) {
+
+                event.preventDefault();
+
+
+                alert(
+                    "Please select a document first."
+                );
+
+
+                return;
+
+            }
+
+
+            /* Prevent double submit */
+
+            if (
+                verifyBtn.classList.contains(
+                    "loading"
+                )
+            ) {
+
+                event.preventDefault();
+
+                return;
+
+            }
+
+
+            /*
+                Stop normal submission
+                temporarily so animation
+                can play.
+            */
+
+            event.preventDefault();
+
+
+            verifyBtn.classList.add(
+                "loading"
+            );
+
+
+            verifyBtn.disabled =
+                true;
+
+
+            fileChip.classList.remove(
+                "show"
+            );
+
+
+            dropzone.style.display =
+                "none";
+
+
+            scanBlock.classList.add(
+                "show"
+            );
+
+
+            /*
+                After 1.7 seconds,
+                send the real POST request.
+            */
+
+            setTimeout(
+                () => {
+
+                    HTMLFormElement
+                        .prototype
+                        .submit
+                        .call(
+                            uploadForm
+                        );
+
+                },
+                1700
+            );
+
+        }
+    );
+
+}
+
+</script>
+
+</body>
+</html>

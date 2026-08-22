@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - TRUEFILE</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --lilac: #b8a8db;
+            --periwinkle: #7fa2d9;
+            --ink: #2b2a3d;
+            --ink-soft: #6b6b7e;
+            --muted: #a0a0b0;
+            --surface: #fdfcfe;
+            --bg: #f8f7fc;
+            --line: #e8e7f0;
+            --line-soft: #f0f0f8;
+            --wax-grad: linear-gradient(135deg, #c9a3dd 0%, #a29bda 55%, #7fa2d9 100%);
+            --shadow: 0 20px 40px rgba(43, 42, 61, 0.15);
+        }
+
+        @keyframes pageIn {
+            from { opacity: 0; transform: translateY(18px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes floatGlow {
+            50% { transform: translate(22px, 16px) scale(1.06); }
+        }
+
+        @keyframes itemIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg);
+            color: var(--ink);
+            line-height: 1.6;
+            overflow-x: hidden;
+            animation: pageIn 0.7s ease both;
+        }
+
+        body::before,
+        body::after {
+            position: fixed;
+            z-index: -1;
+            width: 260px;
+            height: 260px;
+            border-radius: 50%;
+            content: "";
+            opacity: .35;
+            filter: blur(4px);
+            animation: floatGlow 14s ease-in-out infinite alternate;
+        }
+
+        body::before {
+            top: -100px;
+            left: -70px;
+            background: #b8e4d8;
+        }
+
+        body::after {
+            right: -100px;
+            bottom: -100px;
+            background: #f0dcb0;
+            animation-delay: -5s;
+        }
+
+        header {
+            background: white;
+            border-bottom: 1px solid var(--line-soft);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: pageIn .6s ease both;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            font-family: 'Fraunces', serif;
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: 0.14em;
+            color: var(--ink);
+            transition: transform .25s ease;
+        }
+
+        .logo:hover {
+            transform: translateY(-2px);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--ink-soft);
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--lilac);
+            transform: translateY(-2px);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 80px auto;
+            padding: 0 40px;
+            animation: pageIn .8s .08s ease both;
+        }
+
+        .header-section {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .eyebrow {
+            font-size: 12px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 12px;
+        }
+
+        .header-section h1 {
+            font-family: 'Fraunces', serif;
+            font-size: 48px;
+            margin-bottom: 16px;
+            background: var(--wax-grad);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: pageIn .8s .18s ease both;
+        }
+
+        .header-section p {
+            font-size: 16px;
+            color: var(--ink-soft);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: start;
+        }
+
+        .info-section,
+        .form-section {
+            padding: 28px;
+            border: 1px solid var(--line-soft);
+            border-radius: 16px;
+            background: rgba(255, 255, 255, .72);
+            box-shadow: 0 18px 40px rgba(43, 42, 61, .08);
+            backdrop-filter: blur(10px);
+        }
+
+        .info-section h3 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: var(--ink);
+        }
+
+        .info-item {
+            margin-bottom: 24px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--line);
+            animation: itemIn .5s ease both;
+        }
+
+        .info-item:nth-child(2) { animation-delay: .12s; }
+        .info-item:nth-child(3) { animation-delay: .24s; }
+        .info-item:nth-child(4) { animation-delay: .36s; }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-size: 12px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        }
+
+        .info-content {
+            font-size: 16px;
+            color: var(--ink);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-content a {
+            color: var(--lilac);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .info-content a:hover {
+            color: var(--periwinkle);
+        }
+
+        .form-section h3 {
+            font-size: 18px;
+            margin-bottom: 24px;
+            color: var(--ink);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: white;
+            font-family: inherit;
+            font-size: 14px;
+            color: var(--ink);
+            transition: border-color 0.25s, box-shadow 0.25s;
+        }
+
+        input:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--lilac);
+            box-shadow: 0 0 0 4px rgba(184, 168, 219, 0.1);
+            transform: translateY(-1px);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 140px;
+        }
+
+        .btn-submit {
+            background: var(--wax-grad);
+            color: white;
+            padding: 14px 32px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            width: 100%;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .message {
+            display: none;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+            animation: pageIn .35s ease both;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+            animation: pageIn .35s ease both;
+        }
+
+        footer {
+            background: white;
+            border-top: 1px solid var(--line-soft);
+            padding: 40px;
+            text-align: center;
+            margin-top: 80px;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 20px;
+                padding: 20px;
+            }
+
+            .container {
+                margin: 40px auto;
+                padding: 0 20px;
+            }
+
+            .header-section h1 {
+                font-size: 32px;
+            }
+
+            .content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="/" class="logo">
+            <span>TF</span>
+            TRUEFILE
+        </a>
+        <nav class="nav-links">
+            <a href="/#home/">Home</a>
+            <a href="/#about">About</a>
+            <a href="/user-login/">Login</a>
+            <a href="/contact/">Contact</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="header-section">
+            <p class="eyebrow">Get in Touch</p>
+            <h1>We're Here to Help</h1>
+            <p>Questions about verifying your first file, or rolling Truefile out across your team? Send us a message — a real person reads every one.</p>
+        </div>
+
+        <div class="content">
+            <div class="info-section">
+                <h3>Contact Information</h3>
+
+                <div class="info-item">
+                    <div class="info-label">Email</div>
+                    <div class="info-content">
+                        <span>✉️</span>
+                        <a href="mailto:skavideshma@gmail.com">skavideshma@gmail.com</a>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <div class="info-label">Location</div>
+                    <div class="info-content">
+                        <span>📍</span>
+                        <a href="https://www.google.com/maps/place/Tiruvannamalai" target="_blank">Tiruvannamalai, Tamil Nadu</a>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <div class="info-label">Status</div>
+                    <div class="info-content">
+                        <span>🔵</span>
+                        <span>Available 24/7</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>Send us a Message</h3>
+                <div id="message" class="message"></div>
+
+                <form id="contactForm">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="text" id="name" name="name" placeholder="Your full name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" placeholder="your@email.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="msgtext">Message</label>
+                        <textarea id="msgtext" name="message" placeholder="Tell us what's on your mind..." required></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-submit" id="submitBtn">Send Message</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Truefile. Every file, verified true.</p>
+    </footer>
+
+    <script>
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const submitBtn = document.getElementById('submitBtn');
+            const messageDiv = document.getElementById('message');
+            const originalText = submitBtn.textContent;
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Sending...';
+            messageDiv.className = 'message';
+            messageDiv.textContent = '';
+
+            fetch('/contact/', {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    messageDiv.className = 'message success';
+                    messageDiv.textContent = '✓ Message sent successfully! We\'ll get back to you soon.';
+                    submitBtn.textContent = 'Message Sent!';
+                    setTimeout(() => {
+                        document.getElementById('contactForm').reset();
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = originalText;
+                        messageDiv.className = 'message';
+                    }, 2000);
+                } else {
+                    messageDiv.className = 'message error';
+                    messageDiv.textContent = '✗ Error: ' + data.message;
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalText;
+                }
+            })
+            .catch(error => {
+                messageDiv.className = 'message error';
+                messageDiv.textContent = '✗ Error sending message. Please try again.';
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            });
+        });
+    </script>
+</body>
+</html>

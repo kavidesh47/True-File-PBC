@@ -1,0 +1,354 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>TRUEFILE - User Login</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+:root{
+    --navy:#1E3A8A;
+    --violet:#6A11CB;
+    --blue:#2563EB;
+    --red:#DC2626;
+    --ink:#1f2333;
+    --muted:#6b7280;
+    --line:#e7e8f2;
+    --surface:rgba(255,255,255,0.9);
+    --shadow: 0 24px 60px -24px rgba(30,20,80,0.35);
+}
+
+*{ margin:0; padding:0; box-sizing:border-box; }
+
+body{
+    font-family:'Outfit', Arial, sans-serif;
+    color:var(--ink);
+    min-height:100vh;
+    overflow-x:hidden;
+    position:relative;
+}
+
+h1,h2,.display{ font-family:'Fraunces', serif; font-weight:600; }
+a{ color:inherit; text-decoration:none; }
+button{ font-family:inherit; cursor:pointer; }
+
+@media (prefers-reduced-motion: reduce){
+    *{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; }
+}
+
+/* ---------------- animated gradient background ---------------- */
+#bgCanvas{ position:fixed; inset:0; width:100%; height:100%; z-index:-2; filter:blur(70px) saturate(1.25); }
+.grain{
+    position:fixed; inset:0; z-index:-1; pointer-events:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+    mix-blend-mode:overlay;
+}
+
+/* ---------------- topbar ---------------- */
+.topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:22px clamp(20px,4vw,50px);
+    opacity:0; animation:fadeDown .7s cubic-bezier(.22,1,.36,1) forwards;
+}
+@keyframes fadeDown{ from{opacity:0; transform:translateY(-16px);} to{opacity:1; transform:translateY(0);} }
+.brand{ display:flex; align-items:center; gap:12px; }
+.brand .mark{
+    width:42px;height:42px;border-radius:12px;
+    background:linear-gradient(135deg,var(--navy),var(--violet));
+    display:flex;align-items:center;justify-content:center;
+    color:#fff; font-family:'Fraunces',serif; font-style:italic; font-weight:600; font-size:18px;
+    box-shadow:0 10px 22px -8px rgba(106,17,203,0.55);
+}
+.brand h1{ font-size:20px; color:#fff; }
+.brand .sub{ font-size:12px; color:rgba(255,255,255,0.7); margin-top:1px; }
+.back-link{
+    display:flex; align-items:center; gap:8px;
+    color:rgba(255,255,255,0.85); font-size:13.5px;
+    background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.25);
+    padding:9px 16px; border-radius:999px; backdrop-filter:blur(10px);
+    transition:background .2s ease, transform .2s ease;
+}
+.back-link:hover{ background:rgba(255,255,255,0.2); transform:translateX(-3px); }
+
+.stage{
+    position:relative; z-index:1;
+    min-height:calc(100vh - 90px);
+    display:flex; align-items:center; justify-content:center;
+    padding:30px 24px 60px;
+}
+
+/* ---------------- card ---------------- */
+.card{
+    width:100%; max-width:420px;
+    background:var(--surface); backdrop-filter:blur(16px);
+    border:1px solid rgba(255,255,255,0.7);
+    border-radius:26px; padding:44px 40px 36px;
+    box-shadow:var(--shadow);
+    text-align:center;
+    opacity:0; transform:translateY(26px) scale(0.97);
+    animation:cardRise .8s cubic-bezier(.22,1,.36,1) forwards .1s;
+}
+@keyframes cardRise{ to{opacity:1; transform:translateY(0) scale(1);} }
+
+.seal-badge{
+    width:80px;height:80px;border-radius:50%;
+    background:linear-gradient(135deg,var(--navy),var(--violet));
+    display:flex;align-items:center;justify-content:center;
+    margin:0 auto 18px;
+    box-shadow:0 16px 30px -12px rgba(106,17,203,0.5);
+    animation:gentleFloat 3.4s ease-in-out infinite;
+}
+@keyframes gentleFloat{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-8px); } }
+.seal-badge svg{ width:32px;height:32px; color:#fff; }
+
+h1.title{ font-size:24px; margin-bottom:6px; }
+p.subtitle{ font-size:13.5px; color:var(--muted); margin-bottom:26px; }
+
+/* ---------------- error banner ---------------- */
+.error{
+    background:#fdecec; color:#b91c1c;
+    border:1px solid #f2d3d3;
+    border-radius:12px; padding:11px 14px;
+    font-size:13px; text-align:left; margin-bottom:18px;
+    display:flex; align-items:center; gap:9px;
+    animation:errorIn .35s cubic-bezier(.22,1,.36,1);
+}
+@keyframes errorIn{ from{opacity:0; transform:translateY(-6px);} to{opacity:1; transform:translateY(0);} }
+.error svg{ width:16px;height:16px; flex-shrink:0; }
+
+.field{ text-align:left; margin-bottom:16px; position:relative; }
+.field label{ display:block; font-size:12px; color:var(--muted); margin-bottom:7px; letter-spacing:0.03em; }
+.input-wrap{ position:relative; }
+.input-wrap svg.icon{ position:absolute; left:14px; top:50%; transform:translateY(-50%); width:16px;height:16px; color:var(--muted); transition:color .25s ease; }
+.field input{
+    width:100%; padding:13px 14px 13px 40px; border-radius:13px;
+    border:1.5px solid var(--line); background:#fff;
+    font-family:inherit; font-size:14.5px; color:var(--ink);
+    transition:border-color .25s ease, box-shadow .25s ease;
+}
+.field input:focus{ outline:none; border-color:var(--violet); box-shadow:0 0 0 4px rgba(106,17,203,0.12); }
+.input-wrap:focus-within svg.icon{ color:var(--violet); }
+
+.toggle-pass{
+    position:absolute; right:12px; top:50%; transform:translateY(-50%);
+    color:var(--muted); font-size:12px; padding:4px 6px; border:none; background:none;
+    transition:color .2s ease;
+}
+.toggle-pass:hover{ color:var(--ink); }
+
+.row-between{ display:flex; align-items:center; justify-content:space-between; margin:2px 0 22px; font-size:12.5px; color:var(--muted); }
+.remember{ display:flex; align-items:center; gap:7px; }
+.remember input{ accent-color:var(--violet); width:14px;height:14px; }
+.row-between a{ color:var(--violet); font-weight:600; transition:opacity .2s ease; }
+.row-between a:hover{ opacity:0.7; }
+
+/* ---------------- submit button ---------------- */
+.btn-login{
+    width:100%; padding:15px; border-radius:13px;
+    background:linear-gradient(135deg,var(--navy),var(--violet));
+    color:#fff; font-size:15px; font-weight:600;
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    position:relative;
+    box-shadow:0 16px 32px -14px rgba(106,17,203,0.5);
+    transition:transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .25s ease;
+    border:none;
+}
+.btn-login:hover{ box-shadow:0 20px 40px -14px rgba(106,17,203,0.65); }
+.btn-login:active{ transform:scale(0.97); }
+.btn-login.loading{ pointer-events:none; }
+.btn-login .label{ transition:opacity .2s ease; }
+.btn-login.loading .label, .btn-login.success .label{ opacity:0; }
+
+.spinner{
+    position:absolute; width:18px;height:18px;border-radius:50%;
+    border:2.5px solid rgba(255,255,255,0.35); border-top-color:#fff;
+    opacity:0; transform:scale(0.6);
+    transition:opacity .2s ease, transform .2s ease;
+}
+.btn-login.loading .spinner{ opacity:1; transform:scale(1); animation:spin .7s linear infinite; }
+@keyframes spin{ to{ transform:rotate(360deg) scale(1); } }
+
+.check{ position:absolute; opacity:0; transform:scale(0.5); transition:opacity .25s ease, transform .35s cubic-bezier(.34,1.56,.64,1); }
+.check svg{ width:20px;height:20px; display:block; }
+.btn-login.success .check{ opacity:1; transform:scale(1); }
+
+.divider{ display:flex; align-items:center; gap:12px; margin:24px 0 18px; color:var(--muted); font-size:12px; }
+.divider::before, .divider::after{ content:""; flex:1; height:1px; background:var(--line); }
+
+.swap-hint{ font-size:13px; color:var(--muted); }
+.swap-hint a{ color:var(--violet); font-weight:600; }
+.swap-hint a:hover{ opacity:0.75; }
+
+@media (max-width:460px){
+    .card{ padding:36px 26px 30px; border-radius:22px; }
+}
+
+</style>
+</head>
+
+<body>
+
+<canvas id="bgCanvas"></canvas>
+<div class="grain"></div>
+
+<div class="topbar">
+    <div class="brand">
+        <span class="mark">tf</span>
+        <div>
+            <h1>TRUEFILE</h1>
+            <div class="sub">User Login</div>
+        </div>
+    </div>
+    <a href="{% url 'home' %}" class="back-link">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Back to Truefile
+    </a>
+</div>
+
+<div class="stage">
+    <div class="card">
+
+        <div class="seal-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/></svg>
+        </div>
+
+        <h1 class="title">Welcome back</h1>
+        <p class="subtitle">Log in to view and manage your sealed files.</p>
+
+        {% if error %}
+        <div class="error" id="loginError">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16h.01"/></svg>
+            {{ error }}
+        </div>
+        {% elif login_error %}
+        <div class="error" id="loginError">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16h.01"/></svg>
+            {{ login_error }}
+        </div>
+        {% endif %}
+
+        <form method="POST" action="{% url 'user_login' %}" id="loginForm" novalidate>
+            {% csrf_token %}
+
+            <div class="field">
+                <label for="username">Username</label>
+                <div class="input-wrap">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/></svg>
+                    <input id="username" name="username" type="text" placeholder="yourusername" autocomplete="username" required>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="password">Password</label>
+                <div class="input-wrap">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+                    <input id="password" name="password" type="password" placeholder="••••••••" autocomplete="current-password" required style="padding-right:56px;">
+                    <button type="button" class="toggle-pass" id="togglePass">Show</button>
+                </div>
+            </div>
+
+            <div class="row-between">
+                <label class="remember"><input type="checkbox" name="remember"> Remember me</label>
+            </div>
+
+            <button type="submit" class="btn-login" id="loginBtn">
+                <span class="label">Log in</span>
+                <span class="spinner"></span>
+                <span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>
+            </button>
+        </form>
+
+        <div class="divider">or</div>
+        <p class="swap-hint">Don't have an account? <a href="{% url 'user_register' %}">Register</a></p>
+    </div>
+</div>
+
+<script>
+// ---------------- animated gradient background ----------------
+const canvas = document.getElementById('bgCanvas');
+const ctx = canvas.getContext('2d');
+let w, h, dpr;
+function resize(){
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    w = window.innerWidth; h = window.innerHeight;
+    canvas.width = w * dpr; canvas.height = h * dpr;
+    canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+resize();
+window.addEventListener('resize', resize);
+const palette = ['#1E3A8A', '#6A11CB', '#2563EB', '#8B5CF6', '#1e293b'];
+const blobs = Array.from({length:6}).map((_,i) => ({
+    x: Math.random()*w, y: Math.random()*h,
+    r: 180 + Math.random()*240,
+    color: palette[i % palette.length],
+    vx: (Math.random()-0.5)*0.22, vy: (Math.random()-0.5)*0.22,
+    phase: Math.random()*Math.PI*2
+}));
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function draw(t){
+    ctx.fillStyle = '#eef1f7';
+    ctx.fillRect(0,0,w,h);
+    blobs.forEach(b => {
+        if(!reducedMotion){
+            b.x += b.vx; b.y += b.vy;
+            if (b.x < -b.r) b.x = w + b.r;
+            if (b.x > w + b.r) b.x = -b.r;
+            if (b.y < -b.r) b.y = h + b.r;
+            if (b.y > h + b.r) b.y = -b.r;
+        }
+        const pulse = reducedMotion ? 1 : 1 + Math.sin(t/1900 + b.phase) * 0.07;
+        const grad = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.r*pulse);
+        grad.addColorStop(0, b.color + '55');
+        grad.addColorStop(1, b.color + '00');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, b.r*pulse, 0, Math.PI*2);
+        ctx.fill();
+    });
+    if (!reducedMotion) requestAnimationFrame(draw);
+}
+requestAnimationFrame(draw);
+
+// ---------------- toggle password visibility ----------------
+const password = document.getElementById('password');
+const togglePass = document.getElementById('togglePass');
+togglePass.addEventListener('click', () => {
+    const isPass = password.type === 'password';
+    password.type = isPass ? 'text' : 'password';
+    togglePass.textContent = isPass ? 'Hide' : 'Show';
+});
+
+// ---------------- submit animation ----------------
+const loginForm = document.getElementById('loginForm');
+const loginBtn = document.getElementById('loginBtn');
+loginForm.addEventListener('submit', () => {
+    if (loginBtn.classList.contains('loading')) return;
+    loginBtn.classList.add('loading');
+});
+
+// ---------------- clear error banner on input or after timeout ----------------
+const loginError = document.getElementById('loginError');
+if (loginError) {
+    const clearError = () => {
+        loginError.style.transition = 'opacity .3s ease, transform .3s ease';
+        loginError.style.opacity = '0';
+        loginError.style.transform = 'translateY(-6px)';
+        setTimeout(() => loginError.remove(), 350);
+    };
+    const usernameInput = document.getElementById('username');
+    if (usernameInput) usernameInput.addEventListener('input', clearError, { once: true });
+    if (password) password.addEventListener('input', clearError, { once: true });
+    loginForm.addEventListener('click', (e) => { if (e.target.tagName === 'INPUT') clearError(); });
+    setTimeout(clearError, 5000);
+}
+
+</script>
+
+</body>
+</html>

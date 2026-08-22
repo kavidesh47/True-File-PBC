@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>True File | Verification Result</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root { --ink:#172a3a; --muted:#708493; --teal:#087f8c; --teal-dark:#075e6a; --line:#dcebe7; --good:#218261; --bad:#c45252; }
+* { box-sizing:border-box; margin:0; padding:0; }
+body { min-height:100vh; color:var(--ink); font-family:"DM Sans",sans-serif; background:linear-gradient(135deg,#eaf6f2,#f8f4e9 55%,#d8eef2); }
+body:before, body:after { position:fixed; z-index:-1; width:25rem; height:25rem; border-radius:50%; content:""; opacity:.42; filter:blur(4px); animation:drift 15s ease-in-out infinite alternate; }
+body:before { top:-11rem; left:-8rem; background:#9edacf; } body:after { right:-10rem; bottom:-13rem; background:#f2d9a7; animation-delay:-5s; }
+.page { width:min(760px,calc(100% - 40px)); margin:auto; padding:28px 0 50px; animation:rise .7s ease both; }
+.topbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:45px; } .brand { display:flex; align-items:center; gap:12px; } .mark { display:grid; width:42px; height:42px; place-items:center; border-radius:13px; color:white; font-size:20px; background:var(--teal); box-shadow:0 8px 18px #087f8c33; } .brand h1 { font:700 19px "Space Grotesk",sans-serif; } .brand p { color:var(--muted); font-size:12px; }
+.back { padding:10px 15px; border:1px solid #c8ded9; border-radius:10px; color:var(--ink); font-weight:600; text-decoration:none; background:#ffffffad; transition:.25s; } .back:hover { color:white; background:var(--teal); transform:translateX(-3px); }
+.card { position:relative; overflow:hidden; padding:42px 42px 35px; border:1px solid white; border-radius:22px; text-align:center; background:#ffffffc7; box-shadow:0 25px 70px #1c596022; backdrop-filter:blur(15px); } .card:before { position:absolute; top:0; left:0; width:100%; height:5px; content:""; background:var(--teal); } .card.failure:before { background:var(--bad); }
+.icon { display:grid; width:82px; height:82px; margin:0 auto 22px; place-items:center; border:7px solid #28a77c20; border-radius:50%; color:white; font-size:42px; font-weight:600; background:var(--good); animation:check-in .65s cubic-bezier(.2,.8,.3,1) both, pulse-good 2.4s 1s infinite; } .failure .icon { border-color:#c4525220; background:var(--bad); animation:check-in .65s cubic-bezier(.2,.8,.3,1) both, pulse-bad 2.4s 1s infinite; }
+.eyebrow { margin-bottom:10px; color:var(--teal); font-size:11px; font-weight:700; letter-spacing:1.8px; text-transform:uppercase; } .failure .eyebrow { color:var(--bad); } h2 { font:600 32px "Space Grotesk",sans-serif; } .message { max-width:490px; margin:10px auto 28px; color:var(--muted); line-height:1.6; }
+.details { overflow:hidden; margin-top:5px; border:1px solid var(--line); border-radius:14px; text-align:left; background:#f9fdfc; animation:details-in .6s .25s ease both; } .detail { display:flex; justify-content:space-between; gap:20px; padding:15px 17px; border-bottom:1px solid var(--line); font-size:13px; } .detail:last-child { border-bottom:0; } .detail strong { color:var(--muted); font-weight:600; } .detail span { max-width:60%; color:var(--ink); font-weight:600; text-align:right; word-break:break-word; }
+.actions { display:flex; justify-content:center; gap:10px; margin-top:27px; } .action { padding:11px 17px; border:1px solid #c8ded9; border-radius:10px; color:var(--ink); font:600 13px "DM Sans",sans-serif; text-decoration:none; background:white; transition:.25s; } .action.primary { border-color:var(--teal); color:white; background:var(--teal); } .action:hover { transform:translateY(-2px); box-shadow:0 7px 16px #1c596020; } .action.primary:hover { background:var(--teal-dark); }
+@keyframes rise { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:translateY(0); } } @keyframes check-in { from { opacity:0; transform:scale(.4) rotate(-25deg); } to { opacity:1; transform:scale(1) rotate(0); } } @keyframes details-in { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } } @keyframes pulse-good { 50% { box-shadow:0 0 0 12px #28a77c00; } } @keyframes pulse-bad { 50% { box-shadow:0 0 0 12px #c4525200; } } @keyframes drift { to { transform:translate(35px,25px) scale(1.08); } }
+@media (max-width:600px) { .page { width:calc(100% - 24px); padding-top:16px; } .topbar { margin-bottom:27px; } .card { padding:34px 20px 25px; } h2 { font-size:27px; } .detail { align-items:flex-start; flex-direction:column; gap:5px; } .detail span { max-width:100%; text-align:left; } .actions { flex-direction:column; } .action { text-align:center; } }
+</style>
+</head>
+<body>
+<main class="page">
+<nav class="topbar"><div class="brand"><div class="mark">✓</div><div><h1>TRUE FILE</h1><p>Document verification workspace</p></div></div><a class="back" href="{% url 'admin_dashboard' %}">&larr; Dashboard</a></nav>
+<section class="card {% if color != 'green' %}failure{% endif %}">
+<div class="icon">{% if color == "green" %}✓{% else %}!{% endif %}</div>
+<div class="eyebrow">Verification complete</div>
+<h2>{{ status }}</h2>
+<p class="message">{% if color == "green" %}The document fingerprint matches a trusted original in the True File records.{% else %}The document could not be matched with a trusted original. Review the file before using it.{% endif %}</p>
+{% if document %}<div class="details"><div class="detail"><strong>Document name</strong><span>{{ document.document_name }}</span></div><div class="detail"><strong>Document type</strong><span>{{ document.document_type }}</span></div><div class="detail"><strong>Stored status</strong><span>{{ document.status }}</span></div><div class="detail"><strong>Upload date</strong><span>{{ document.upload_date }}</span></div></div>{% endif %}
+<div class="actions"><a class="action primary" href="{% url 'admin_dashboard' %}">Back to Dashboard</a><a class="action" href="javascript:history.back()">Verify another file</a></div>
+</section>
+</main>
+</body>
+</html>

@@ -1,0 +1,551 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>TRUEFILE - Admin Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+:root{
+    --navy:#1E3A8A;
+    --violet:#6A11CB;
+    --blue:#2563EB;
+    --green:#16A34A;
+    --ink:#1f2333;
+    --muted:#6b7280;
+    --line:#e7e8f2;
+    --surface:rgba(255,255,255,0.85);
+    --shadow: 0 24px 60px -24px rgba(30,20,80,0.35);
+}
+
+*{ margin:0; padding:0; box-sizing:border-box; }
+
+body{
+    font-family:'Outfit', Arial, sans-serif;
+    color:var(--ink);
+    min-height:100vh;
+    overflow-x:hidden;
+    position:relative;
+}
+
+h1,h2,.display{ font-family:'Fraunces', serif; font-weight:600; }
+
+@media (prefers-reduced-motion: reduce){
+    *{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; }
+}
+
+/* ---------------- animated gradient background ---------------- */
+#bgCanvas{
+    position:fixed; inset:0; width:100%; height:100%; z-index:-2;
+    filter:blur(70px) saturate(1.25);
+}
+.grain{
+    position:fixed; inset:0; z-index:-1; pointer-events:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+    mix-blend-mode:overlay;
+}
+
+/* ---------------- topbar ---------------- */
+.topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:22px clamp(20px,4vw,50px);
+    opacity:0;
+    animation:fadeDown .7s cubic-bezier(.22,1,.36,1) forwards;
+}
+@keyframes fadeDown{ from{opacity:0; transform:translateY(-16px);} to{opacity:1; transform:translateY(0);} }
+
+.brand{ display:flex; align-items:center; gap:12px; }
+.brand .mark{
+    width:42px;height:42px;border-radius:12px;
+    background:linear-gradient(135deg,var(--navy),var(--violet));
+    display:flex;align-items:center;justify-content:center;
+    color:#fff; font-family:'Fraunces',serif; font-style:italic; font-weight:600; font-size:18px;
+    box-shadow:0 10px 22px -8px rgba(106,17,203,0.55);
+}
+.brand h1{ font-size:20px; color:#fff; letter-spacing:0.01em; }
+.brand .sub{ font-size:12px; color:rgba(255,255,255,0.7); margin-top:1px; }
+
+.admin-chip{
+    display:flex; align-items:center; gap:10px;
+    background:rgba(255,255,255,0.12);
+    border:1px solid rgba(255,255,255,0.25);
+    padding:8px 16px 8px 8px;
+    border-radius:999px;
+    backdrop-filter:blur(10px);
+    color:#fff; font-size:13.5px;
+}
+.admin-chip .av{
+    width:30px;height:30px;border-radius:50%;
+    background:linear-gradient(135deg,#fff,#dcd3f5);
+    color:var(--violet); display:flex;align-items:center;justify-content:center;
+    font-weight:700; font-size:12.5px;
+}
+
+.wrap{ max-width:1200px; margin:0 auto; padding:20px clamp(20px,4vw,50px) 70px; position:relative; z-index:1; }
+
+/* ---------------- welcome / video panel ---------------- */
+.hero-grid{ display:grid; grid-template-columns:1.1fr 0.9fr; gap:22px; margin-bottom:30px; }
+
+.welcome-glass{
+    background:linear-gradient(135deg, rgba(30,58,138,0.92), rgba(106,17,203,0.88));
+    border-radius:22px; padding:34px;
+    color:#fff; position:relative; overflow:hidden;
+    opacity:0; transform:translateY(20px);
+    animation:fadeUp .6s cubic-bezier(.22,1,.36,1) forwards .05s;
+    box-shadow:var(--shadow);
+}
+.welcome-glass::before{
+    content:""; position:absolute; inset:0;
+    background:radial-gradient(circle at 85% 15%, rgba(255,255,255,0.18), transparent 55%);
+}
+.welcome-glass .spark{ position:absolute; color:rgba(255,255,255,0.55); animation:twinkle 3.2s ease-in-out infinite; }
+@keyframes twinkle{ 0%,100%{opacity:0.15; transform:scale(0.7);} 50%{opacity:0.9; transform:scale(1.1);} }
+.welcome-glass h2{ font-size:26px; position:relative; z-index:1; }
+.welcome-glass p{ margin-top:10px; font-size:14px; color:rgba(255,255,255,0.85); max-width:42ch; position:relative; z-index:1; }
+.welcome-glass .updated{ margin-top:22px; display:flex; gap:8px; align-items:center; font-size:12.5px; color:rgba(255,255,255,0.75); position:relative; z-index:1; }
+.live-dot{ width:7px;height:7px;border-radius:50%; background:#4ade80; animation:pulseDot 1.6s ease-in-out infinite; }
+@keyframes pulseDot{ 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
+.video-panel{
+    border-radius:22px; overflow:hidden; position:relative;
+    aspect-ratio:16/10; cursor:pointer; background:#0f0d18;
+    opacity:0; transform:translateY(20px);
+    animation:fadeUp .6s cubic-bezier(.22,1,.36,1) forwards .12s;
+    box-shadow:var(--shadow);
+}
+.video-panel video{ width:100%; height:100%; object-fit:cover; display:block; }
+.video-panel .veil{ position:absolute; inset:0; background:linear-gradient(180deg, rgba(15,13,24,0) 40%, rgba(15,13,24,0.8) 100%); display:flex; align-items:flex-end; padding:18px; }
+.video-panel .veil-top{ position:absolute; top:14px; left:16px; right:16px; display:flex; justify-content:space-between; align-items:center; }
+.video-panel .label{ color:#fff; font-size:11.5px; letter-spacing:0.08em; text-transform:uppercase; opacity:0.85; display:flex; align-items:center; gap:7px; }
+.video-panel .label .dot{ width:6px;height:6px;border-radius:50%; background:#e06666; animation:recPulse 1.4s ease-in-out infinite; }
+@keyframes recPulse{ 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+.play-btn{
+    width:56px;height:56px; border-radius:50%;
+    background:rgba(255,255,255,0.16); border:1.5px solid rgba(255,255,255,0.5);
+    backdrop-filter:blur(6px);
+    display:flex;align-items:center;justify-content:center;
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%) scale(1);
+    transition:transform .25s cubic-bezier(.34,1.56,.64,1), background .25s ease, opacity .3s ease;
+}
+.play-btn:hover{ background:rgba(255,255,255,0.26); transform:translate(-50%,-50%) scale(1.08); }
+.play-btn svg{ width:20px;height:20px; color:#fff; margin-left:3px; }
+.video-panel.playing .play-btn{ opacity:0; pointer-events:none; transform:translate(-50%,-50%) scale(0.7); }
+.video-caption h4{ color:#fff; font-size:14px; font-weight:500; }
+.video-caption span{ color:#d8d3ee; font-size:11px; }
+.video-scrub{ position:absolute; bottom:0; left:0; right:0; height:3px; background:rgba(255,255,255,0.15); }
+.video-scrub-fill{ height:100%; width:0%; background:linear-gradient(90deg,var(--navy),var(--violet)); }
+
+/* ---------------- stat cards ---------------- */
+.stats{ display:grid; grid-template-columns:repeat(4,1fr); gap:20px; margin-bottom:30px; }
+.stat-card{
+    background:var(--surface); backdrop-filter:blur(14px);
+    border:1px solid rgba(255,255,255,0.6);
+    border-radius:18px; padding:28px 20px; text-align:center;
+    box-shadow:0 14px 34px -18px rgba(30,20,80,0.3);
+    opacity:0; transform:translateY(20px) scale(0.97);
+    animation:fadeUp .55s cubic-bezier(.22,1,.36,1) forwards;
+    transition:transform .3s cubic-bezier(.22,1,.36,1), box-shadow .3s ease;
+    position:relative; overflow:hidden;
+}
+.stat-card::after{
+    content:""; position:absolute; top:-40%; left:-20%; width:60%; height:180%;
+    background:linear-gradient(120deg, transparent, rgba(255,255,255,0.5), transparent);
+    transform:translateX(-140%) rotate(12deg);
+    transition:transform .8s ease;
+}
+.stat-card:hover::after{ transform:translateX(140%) rotate(12deg); }
+.stat-card:hover{ transform:translateY(-7px); box-shadow:0 22px 44px -18px rgba(30,20,80,0.4); }
+.stat-card:nth-child(1){ animation-delay:.18s; }
+.stat-card:nth-child(2){ animation-delay:.26s; }
+.stat-card:nth-child(3){ animation-delay:.34s; }
+.stat-card:nth-child(4){ animation-delay:.42s; }
+@keyframes fadeUp{ to{ opacity:1; transform:translateY(0) scale(1); } }
+
+.stat-icon{
+    width:46px;height:46px;border-radius:13px; margin:0 auto 14px;
+    display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(135deg,var(--navy),var(--violet));
+    color:#fff; box-shadow:0 10px 20px -8px rgba(106,17,203,0.5);
+}
+.stat-icon svg{ width:20px;height:20px; }
+.stat-card .number{ font-size:38px; font-weight:700; font-family:'Fraunces',serif; color:var(--navy); margin-bottom:4px; }
+.stat-card .label{ font-size:13.5px; color:var(--muted); font-weight:500; }
+
+/* ---------------- action buttons ---------------- */
+.section-label{ font-size:13px; color:rgba(255,255,255,0.8); letter-spacing:0.08em; text-transform:uppercase; margin-bottom:14px; }
+.actions{ display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+
+.action-btn{
+    display:flex; align-items:center; gap:14px;
+    padding:20px 22px; border-radius:16px;
+    background:var(--surface); backdrop-filter:blur(14px);
+    border:1px solid rgba(255,255,255,0.6);
+    text-decoration:none; color:var(--ink);
+    font-size:16px; font-weight:600;
+    box-shadow:0 12px 28px -16px rgba(30,20,80,0.25);
+    position:relative; overflow:hidden;
+    opacity:0; transform:translateY(18px);
+    animation:fadeUp .5s cubic-bezier(.22,1,.36,1) forwards;
+    transition:transform .22s cubic-bezier(.34,1.56,.64,1), box-shadow .25s ease;
+    cursor:pointer;
+}
+.action-btn:hover{ transform:translateY(-5px); box-shadow:0 20px 38px -16px rgba(30,20,80,0.35); }
+.action-btn:active{ transform:scale(0.97) translateY(-2px); }
+.action-btn:nth-child(1){ animation-delay:.5s; }
+.action-btn:nth-child(2){ animation-delay:.56s; }
+.action-btn:nth-child(3){ animation-delay:.62s; }
+.action-btn:nth-child(4){ animation-delay:.68s; }
+.action-btn:nth-child(5){ animation-delay:.74s; }
+
+.action-btn .ic{
+    width:44px;height:44px;border-radius:12px; flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    color:#fff;
+}
+.action-btn .ic svg{ width:20px;height:20px; }
+.action-btn .txt small{ display:block; font-size:11.5px; color:var(--muted); font-weight:400; margin-top:2px; }
+
+.action-btn.verify .ic{ background:linear-gradient(135deg,#16A34A,#4ade80); }
+.action-btn.ledger .ic{ background:linear-gradient(135deg,#2563EB,#60a5fa); }
+.action-btn.reports .ic{ background:linear-gradient(135deg,#f59e0b,#fbbf24); }
+.action-btn.contact .ic{ background:linear-gradient(135deg,#ec4899,#f472b6); }
+.action-btn.logout{ grid-column:1 / -1; width:100%; text-align:left; }
+.action-btn.logout .ic{ background:linear-gradient(135deg,var(--navy),var(--violet)); }
+
+/* ripple */
+.ripple{
+    position:absolute; border-radius:50%;
+    background:rgba(30,58,138,0.15);
+    transform:scale(0); animation:rippleOut .6s ease-out forwards;
+    pointer-events:none;
+}
+@keyframes rippleOut{ to{ transform:scale(3); opacity:0; } }
+
+/* ---------------- logout modal + wipe ---------------- */
+.modal-overlay{
+    position:fixed; inset:0; z-index:200; background:rgba(20,15,40,0.5); backdrop-filter:blur(6px);
+    display:flex; align-items:center; justify-content:center; padding:24px;
+    opacity:0; pointer-events:none; transition:opacity .3s ease;
+}
+.modal-overlay.active{ opacity:1; pointer-events:auto; }
+.modal{
+    background:#fff; border-radius:22px; padding:34px 32px; width:100%; max-width:330px; text-align:center;
+    box-shadow:var(--shadow);
+    transform:scale(0.85) translateY(20px); opacity:0;
+    transition:transform .4s cubic-bezier(.34,1.56,.64,1), opacity .3s ease;
+}
+.modal-overlay.active .modal{ transform:scale(1) translateY(0); opacity:1; }
+.modal .m-icon{
+    width:52px;height:52px;border-radius:50%; margin:0 auto 16px;
+    background:linear-gradient(135deg,var(--navy),var(--violet));
+    display:flex;align-items:center;justify-content:center; color:#fff;
+}
+.modal .m-icon svg{ width:22px;height:22px; }
+.modal h3{ font-size:18px; }
+.modal p{ font-size:13.5px; color:var(--muted); margin-top:8px; }
+.modal-actions{ display:flex; gap:10px; margin-top:22px; }
+.modal-actions button{ flex:1; padding:12px; border-radius:11px; font-size:13.5px; font-weight:600; border:none; cursor:pointer; transition:transform .18s ease; }
+.modal-actions button:active{ transform:scale(0.95); }
+.btn-cancel{ background:#f1f0fa; color:var(--muted); }
+.btn-logout-confirm{ background:linear-gradient(135deg,var(--navy),var(--violet)); color:#fff; }
+
+.wipe-overlay{
+    position:fixed; inset:0; z-index:300; background:linear-gradient(135deg,var(--navy),var(--violet));
+    display:flex; align-items:center; justify-content:center;
+    clip-path:circle(0% at 92% 95%);
+    transition:clip-path .9s cubic-bezier(.76,0,.24,1);
+    pointer-events:none;
+}
+.wipe-overlay.active{ clip-path:circle(150% at 92% 95%); pointer-events:auto; }
+.wipe-content{ text-align:center; color:#fff; opacity:0; transition:opacity .4s ease .5s; }
+.wipe-overlay.active .wipe-content{ opacity:1; }
+.wipe-content .mark{
+    width:60px;height:60px;border-radius:16px; margin:0 auto 16px;
+    background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Fraunces',serif; font-style:italic; font-size:22px;
+}
+.wipe-content h2{ font-size:22px; }
+.wipe-content p{ color:rgba(255,255,255,0.75); font-size:13.5px; margin-top:8px; }
+
+@media (max-width:860px){
+    .hero-grid{ grid-template-columns:1fr; }
+    .stats{ grid-template-columns:1fr 1fr; }
+    .actions{ grid-template-columns:1fr; }
+    .action-btn.logout{ grid-column:auto; }
+}
+
+</style>
+</head>
+
+<body>
+
+<canvas id="bgCanvas"></canvas>
+<div class="grain"></div>
+
+<div class="topbar">
+    <div class="brand">
+        <span class="mark">tf</span>
+        <div>
+            <h1>TRUEFILE</h1>
+            <div class="sub">Admin Dashboard</div>
+        </div>
+    </div>
+    <div class="admin-chip">
+        <span class="av">{{ request.user.username|default:"AD"|slice:":2"|upper }}</span>
+        <span>{{ request.user.get_full_name|default:"Admin" }}</span>
+    </div>
+</div>
+
+<div class="wrap">
+
+    <div class="hero-grid">
+        <div class="welcome-glass">
+            <span class="spark" style="top:20px; right:70px; font-size:16px;">✦</span>
+            <span class="spark" style="bottom:26px; right:130px; font-size:12px; animation-delay:1s;">✦</span>
+            <h2>Welcome back, Admin</h2>
+            <p>Here's what's happening across Truefile today — documents sealed, users active, and your verification pipeline at a glance.</p>
+            <div class="updated"><span class="live-dot"></span> Live data · updated just now</div>
+        </div>
+
+        <div class="video-panel" id="videoPanel">
+            <video id="showcaseVideo" muted loop playsinline preload="metadata">
+                <source src="{% static 'videos1/truefile-outro.mp.mp4' %}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <div class="veil-top"><span class="label"><span class="dot"></span> Brand reel</span></div>
+            <button class="play-btn" id="playBtn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7-11-7Z"/></svg></button>
+            <div class="veil"><div class="video-caption"><h4>Truefile — every file, verified true.</h4><span>Tap to play</span></div></div>
+            <div class="video-scrub"><div class="video-scrub-fill" id="scrubFill"></div></div>
+        </div>
+    </div>
+
+    <div class="stats">
+        <div class="stat-card">
+            <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-3.5 3-5.5 7-5.5s7 2 7 5.5"/><path d="M17 8.5c1.4 0 2.5 1.1 2.5 2.5S18.4 13.5 17 13.5"/><path d="M15 20c0-2.5 1.8-4 4.5-4"/></svg></div>
+            <div class="number" data-count="{{ total_users|default:0 }}">0</div>
+            <div class="label">Total Users</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z"/><path d="M14 3v5h5"/></svg></div>
+            <div class="number" data-count="{{ total_documents|default:0 }}">0</div>
+            <div class="label">Total Documents</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg></div>
+            <div class="number" data-count="{{ total_verified |default:0 }}">0</div>
+            <div class="label">Verified Documents</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>
+            <div class="number" data-count="{{ total_history |default:0 }}">0</div>
+            <div class="label">Verification History</div>
+        </div>
+    </div>
+
+    <div class="section-label">Quick actions</div>
+    <div class="actions">
+        <a href="/upload-verification/" class="action-btn verify">
+            <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg></span>
+            <span class="txt">Verify Document<small>Check a file's seal & integrity</small></span>
+        </a>
+        <a href="{% url 'blockchain_ledger' %}" class="action-btn ledger">
+            <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="7" height="7" rx="1.5"/><rect x="14" y="7" width="7" height="7" rx="1.5"/><rect x="8.5" y="14" width="7" height="7" rx="1.5"/><path d="M10 10.5h4M8.5 14V11M15.5 14V11"/></svg></span>
+            <span class="txt">Blockchain Ledger<small>Immutable record of every seal</small></span>
+        </a>
+        <a href="/verification-reports/" class="action-btn reports">
+            <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M12 20V4M20 20v-7"/></svg></span>
+            <span class="txt">Reports<small>Usage & verification analytics</small></span>
+        </a>
+        <a href="/verification-history/" class="action-btn reports">
+            <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M12 20V4M20 20v-7"/></svg></span>
+            <span class="txt">History<small>Usage & verification History</small></span>
+        </a>
+           
+
+        <form method="POST" action="{% url 'admin_logout' %}" style="grid-column:1 / -1;" id="logoutForm">
+            {% csrf_token %}
+            <button type="button" class="action-btn logout" id="logoutBtn" style="width:100%;">
+                <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg></span>
+                <span class="txt">Logout<small>End your admin session</small></span>
+            </button>
+        </form>
+    </div>
+
+</div>
+<div class="modal-overlay" id="logoutModal">
+    <div class="modal">
+        <div class="m-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg></div>
+        <h3>Log out of admin?</h3>
+        <p>You'll need to sign back in to manage Truefile.</p>
+        <div class="modal-actions">
+            <button type="button" class="btn-cancel" id="cancelLogout">Cancel</button>
+            <button type="button" class="btn-logout-confirm" id="confirmLogout">Logout</button>
+        </div>
+    </div>
+</div>
+
+<div class="wipe-overlay" id="wipeOverlay">
+    <div class="wipe-content">
+        <div class="mark">tf</div>
+        <h2>Signed out securely.</h2>
+        <p>Redirecting you to login...</p>
+    </div>
+</div>
+
+<script>
+// ---------------- animated gradient background ----------------
+const canvas = document.getElementById('bgCanvas');
+const ctx = canvas.getContext('2d');
+let w, h, dpr;
+function resize(){
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    w = window.innerWidth; h = window.innerHeight;
+    canvas.width = w * dpr; canvas.height = h * dpr;
+    canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+resize();
+window.addEventListener('resize', resize);
+
+const palette = ['#1E3A8A', '#6A11CB', '#2563EB', '#8B5CF6', '#1e293b'];
+const blobs = Array.from({length:6}).map((_,i) => ({
+    x: Math.random()*w, y: Math.random()*h,
+    r: 180 + Math.random()*240,
+    color: palette[i % palette.length],
+    vx: (Math.random()-0.5)*0.22, vy: (Math.random()-0.5)*0.22,
+    phase: Math.random()*Math.PI*2
+}));
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function draw(t){
+    ctx.fillStyle = '#eef1f7';
+    ctx.fillRect(0,0,w,h);
+    blobs.forEach(b => {
+        if(!reducedMotion){
+            b.x += b.vx; b.y += b.vy;
+            if (b.x < -b.r) b.x = w + b.r;
+            if (b.x > w + b.r) b.x = -b.r;
+            if (b.y < -b.r) b.y = h + b.r;
+            if (b.y > h + b.r) b.y = -b.r;
+        }
+        const pulse = reducedMotion ? 1 : 1 + Math.sin(t/1900 + b.phase) * 0.07;
+        const grad = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.r*pulse);
+        grad.addColorStop(0, b.color + '55');
+        grad.addColorStop(1, b.color + '00');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, b.r*pulse, 0, Math.PI*2);
+        ctx.fill();
+    });
+    if (!reducedMotion) requestAnimationFrame(draw);
+}
+requestAnimationFrame(draw);
+
+// ---------------- count-up stat numbers ----------------
+document.querySelectorAll('.number').forEach(el => {
+    const target = parseInt(el.dataset.count, 10) || 0;
+    const duration = 1000;
+    const start = performance.now();
+    function step(now){
+        const progress = Math.min((now - start) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        el.textContent = Math.round(eased * target);
+        if (progress < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+});
+
+// ---------------- video panel controls ----------------
+document.addEventListener('DOMContentLoaded', () => {
+    const videoPanel = document.getElementById('videoPanel');
+    const showcaseVideo = document.getElementById('showcaseVideo');
+    const playBtn = document.getElementById('playBtn');
+    const scrubFill = document.getElementById('scrubFill');
+
+    if (!videoPanel || !showcaseVideo || !playBtn || !scrubFill) {
+        console.error('Video panel initialization failed: missing element(s)', {
+            videoPanel, showcaseVideo, playBtn, scrubFill
+        });
+        return;
+    }
+
+    function togglePlay() {
+        if (showcaseVideo.paused) {
+            showcaseVideo.play().then(() => {
+                console.log('Video started');
+                videoPanel.classList.add('playing');
+            }).catch(err => {
+                console.warn('Video play failed:', err);
+                videoPanel.classList.remove('playing');
+            });
+        } else {
+            showcaseVideo.pause();
+            videoPanel.classList.remove('playing');
+        }
+    }
+
+    playBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        console.log('Play button clicked');
+        togglePlay();
+    });
+
+    videoPanel.addEventListener('click', () => {
+        console.log('Video panel clicked');
+        togglePlay();
+    });
+
+    showcaseVideo.addEventListener('timeupdate', () => {
+        if (showcaseVideo.duration) {
+            scrubFill.style.width = (showcaseVideo.currentTime / showcaseVideo.duration * 100) + '%';
+        }
+    });
+
+    showcaseVideo.addEventListener('pause', () => videoPanel.classList.remove('playing'));
+    showcaseVideo.addEventListener('play', () => videoPanel.classList.add('playing'));
+    showcaseVideo.addEventListener('error', () => {
+        console.error('Video failed to load:', showcaseVideo.error);
+        videoPanel.classList.remove('playing');
+    });
+});
+
+// ---------------- ripple effect on action buttons ----------------
+document.querySelectorAll('.action-btn').forEach(btn => {
+    btn.addEventListener('click', function(e){
+        const rect = btn.getBoundingClientRect();
+        const ripple = document.createElement('span');
+        const size = Math.max(rect.width, rect.height);
+        ripple.className = 'ripple';
+        ripple.style.width = ripple.style.height = size + 'px';
+        ripple.style.left = (e.clientX - rect.left - size/2) + 'px';
+        ripple.style.top = (e.clientY - rect.top - size/2) + 'px';
+        btn.style.position = 'relative';
+        btn.appendChild(ripple);
+        setTimeout(() => ripple.remove(), 650);
+    });
+});
+
+// ---------------- logout modal + wipe ----------------
+const logoutModal = document.getElementById('logoutModal');
+const wipeOverlay = document.getElementById('wipeOverlay');
+const logoutForm = document.getElementById('logoutForm');
+document.getElementById('logoutBtn').addEventListener('click', () => logoutModal.classList.add('active'));
+document.getElementById('cancelLogout').addEventListener('click', () => logoutModal.classList.remove('active'));
+logoutModal.addEventListener('click', e => { if (e.target === logoutModal) logoutModal.classList.remove('active'); });
+document.getElementById('confirmLogout').addEventListener('click', () => {
+    logoutModal.classList.remove('active');
+    setTimeout(() => {
+        wipeOverlay.classList.add('active');
+        setTimeout(() => logoutForm.submit(), 900);
+    }, 200);
+});
+</script>
+
+</body>
+</html>

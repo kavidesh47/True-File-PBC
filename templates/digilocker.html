@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>True File | True Wallet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root { --ink:#172a3a; --muted:#708493; --teal:#087f8c; --teal-dark:#075e6a; --line:#dcebe7; --paper:#f8fcfb; }
+* { box-sizing:border-box; margin:0; padding:0; }
+body { min-height:100vh; color:var(--ink); font-family:"DM Sans",sans-serif; background:linear-gradient(135deg,#eaf6f2,#f8f4e9 55%,#d8eef2); }
+body:before, body:after { position:fixed; z-index:-1; width:24rem; height:24rem; border-radius:50%; content:""; opacity:.42; filter:blur(4px); animation:drift 15s ease-in-out infinite alternate; }
+body:before { top:-10rem; left:-8rem; background:#9edacf; } body:after { right:-10rem; bottom:-12rem; background:#f2d9a7; animation-delay:-5s; }
+.page { width:min(1180px,calc(100% - 40px)); margin:auto; padding:28px 0 50px; animation:rise .65s ease both; }
+.topbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:22px; }
+.brand { display:flex; align-items:center; gap:12px; } .mark { display:grid; width:42px; height:42px; place-items:center; border-radius:13px; color:white; font-size:20px; background:var(--teal); box-shadow:0 8px 18px #087f8c33; }
+.brand h1 { font:700 19px "Space Grotesk",sans-serif; } .brand p { color:var(--muted); font-size:12px; }
+.back { padding:10px 15px; border:1px solid #c8ded9; border-radius:10px; color:var(--ink); font-weight:600; text-decoration:none; background:#ffffffad; transition:.25s; } .back:hover { color:white; background:var(--teal); transform:translateX(-3px); }
+.hero { display:flex; align-items:end; justify-content:space-between; gap:24px; margin:35px 0 22px; } .eyebrow { margin-bottom:10px; color:var(--teal); font-size:11px; font-weight:700; letter-spacing:1.8px; text-transform:uppercase; } h2 { font:600 38px "Space Grotesk",sans-serif; } .hero p { max-width:430px; color:var(--muted); line-height:1.6; }
+.panel { overflow:hidden; border:1px solid white; border-radius:20px; background:#ffffffb8; box-shadow:0 25px 70px #1c596022; backdrop-filter:blur(15px); }
+.toolbar { display:flex; align-items:center; justify-content:space-between; gap:18px; padding:19px 22px; border-bottom:1px solid var(--line); background:#ffffffa8; } .count { color:var(--muted); font-size:13px; } .count strong { color:var(--ink); font-size:18px; }
+.search { width:min(310px,100%); padding:12px 15px; border:1px solid #cfe3de; border-radius:10px; outline:none; color:var(--ink); font:14px "DM Sans",sans-serif; background:white; } .search:focus { border-color:var(--teal); box-shadow:0 0 0 4px #087f8c14; }
+.table-wrap { overflow-x:auto; } table { width:100%; min-width:740px; border-collapse:collapse; } th { padding:15px 18px; color:var(--muted); font-size:11px; letter-spacing:1px; text-align:left; text-transform:uppercase; background:#f0f8f5; } td { padding:18px; border-top:1px solid var(--line); font-size:14px; } tr { animation:row-in .45s ease both; } tr:hover { background:#f3fbf8; } .document-id { color:var(--teal); font-weight:700; } .type { display:inline-block; padding:5px 9px; border-radius:7px; color:#496b70; font-size:12px; background:#e2f2ed; } .download { display:inline-block; padding:8px 11px; border-radius:8px; color:white; font-size:12px; font-weight:600; text-decoration:none; background:var(--teal); transition:.2s; } .download:hover { background:var(--teal-dark); transform:translateY(-2px); } .delete { padding:8px 11px; border:0; border-radius:8px; color:white; font:600 12px "DM Sans",sans-serif; cursor:pointer; background:#c45252; transition:.2s; } .delete:hover { background:#a83d3d; transform:translateY(-2px); } .empty { color:var(--muted); text-align:center; }
+@keyframes rise { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } } @keyframes row-in { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } } @keyframes drift { to { transform:translate(35px,25px) scale(1.08); } }
+@media (max-width:700px) { .page { width:calc(100% - 24px); padding-top:16px; } .hero { display:block; margin-top:25px; } h2 { font-size:31px; margin-bottom:10px; } .toolbar { align-items:stretch; flex-direction:column; } .search { width:100%; } }
+</style>
+</head>
+<body>
+<main class="page">
+<nav class="topbar"><div class="brand"><div class="mark">+</div><div><h1>TRUE FILE</h1><p>Secure document workspace</p></div></div><a class="back" href="javascript:history.back()">&larr; Back</a></nav>
+<section class="hero"><div><div class="eyebrow">Personal vault</div><h2>True Wallet</h2></div><p>Your verified documents, organized in one secure and searchable place.</p></section>
+<section class="panel">
+<div class="toolbar"><div class="count"><strong id="documentCount">{{ documents|length }}</strong> documents stored</div><input class="search" type="text" id="search" placeholder="Search documents..." aria-label="Search documents"></div>
+<div class="table-wrap"><table id="table"><thead><tr><th>ID</th><th>Document Name</th><th>Type</th><th>Upload Date</th><th>Download</th><th>Actions</th></tr></thead><tbody>
+{% for doc in documents %}<tr><td class="document-id">#{{ doc.id }}</td><td>{{ doc.document_name }}</td><td><span class="type">{{ doc.document_type }}</span></td><td>{{ doc.uploaded_on }}</td><td><a class="download" href="{{ doc.document_file.url }}" download>Download</a></td><td><form method="POST" action="{% url 'delete_document' doc.id %}" onsubmit="return confirm('Delete this document?');">{% csrf_token %}<button class="delete" type="submit">Delete</button></form></td></tr>
+{% empty %}<tr><td class="empty" colspan="6">No verified documents found.</td></tr>{% endfor %}
+</tbody></table></div>
+</section>
+</main>
+<script>
+const searchInput = document.getElementById("search");
+const rows = Array.from(document.querySelectorAll("#table tbody tr"));
+searchInput.addEventListener("input", function () { const query = this.value.toLowerCase().trim(); let visible = 0; rows.forEach(function (row) { const matches = row.textContent.toLowerCase().includes(query); row.style.display = matches ? "" : "none"; if (matches) visible += 1; }); document.getElementById("documentCount").textContent = visible; });
+</script>
+</body>
+</html>

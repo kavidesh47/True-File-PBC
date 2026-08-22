@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Truefile — Every file, verified true</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Outfit:wght@300;400;500;600&family=Mrs+Saint+Delafield&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#faf9fc;
+    --surface:#ffffff;
+    --ink:#2b2a3d;
+    --ink-soft:#514f66;
+    --muted:#8683a0;
+    --line:#e9e4f4;
+    --line-soft:#f1edf9;
+    --lilac:#b98fd1;
+    --periwinkle:#7fa2d9;
+    --lilac-soft:#e6d9f2;
+    --peri-soft:#dbe6f5;
+    --wax-grad: linear-gradient(135deg,#c9a3dd 0%, #b298d4 30%, #93a8db 65%, #7fa2d9 100%);
+    --shadow: 0 20px 60px -20px rgba(90,70,130,0.25);
+    --shadow-soft: 0 8px 30px -12px rgba(90,70,130,0.18);
+    --radius: 22px;
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Outfit', sans-serif;
+    font-weight:400;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  h1,h2,h3,.display{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    letter-spacing:-0.01em;
+    color:var(--ink);
+  }
+  .script{
+    font-family:'Mrs Saint Delafield', cursive;
+    font-weight:400;
+  }
+  a{color:inherit;text-decoration:none;}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;}
+  ::selection{background:var(--lilac-soft);color:var(--ink);}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; scroll-behavior:auto !important;}
+  }
+
+  /* ---------- background texture ---------- */
+  body::before{
+    content:"";
+    position:fixed;inset:0;
+    background:
+      radial-gradient(circle at 15% 8%, rgba(185,143,209,0.10), transparent 45%),
+      radial-gradient(circle at 85% 20%, rgba(127,162,217,0.10), transparent 40%),
+      radial-gradient(circle at 50% 100%, rgba(185,143,209,0.06), transparent 50%);
+    pointer-events:none;
+    z-index:0;
+  }
+
+  /* ---------- seal mark (svg-built) ---------- */
+  .seal{
+    --size:44px;
+    width:var(--size);height:var(--size);
+    display:inline-flex;align-items:center;justify-content:center;
+    position:relative;
+    flex-shrink:0;
+  }
+  .seal svg{width:100%;height:100%;display:block;}
+  .seal-edge{fill:url(#waxGradNav);}
+  .seal-ring{fill:none;stroke:rgba(255,255,255,0.75);stroke-width:1;stroke-dasharray:1.6 2.4;}
+  .seal-face{fill:#fdfcfe;}
+  .seal-letters{
+    font-family:'Fraunces', serif;
+    font-style:italic;
+    font-weight:500;
+  }
+
+  /* ---------- nav ---------- */
+  header.nav{
+    position:fixed;top:0;left:0;right:0;
+    z-index:100;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:18px clamp(20px,5vw,64px);
+    background:rgba(250,249,252,0.7);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+    border-bottom:1px solid transparent;
+    transition:border-color .4s ease, background .4s ease, padding .4s ease;
+  }
+  header.nav.scrolled{
+    border-bottom:1px solid var(--line);
+    padding-top:12px;padding-bottom:12px;
+    background:rgba(250,249,252,0.92);
+  }
+  .brand{display:flex;align-items:center;gap:10px;}
+  .brand-word{
+    font-family:'Fraunces', serif;
+    font-size:19px;
+    letter-spacing:0.14em;
+    font-weight:500;
+  }
+  nav.links{
+    display:flex;align-items:center;gap:clamp(18px,3vw,38px);
+  }
+  nav.links a{
+    font-size:14.5px;
+    color:var(--ink-soft);
+    position:relative;
+    padding:4px 0;
+    transition:color .25s ease;
+  }
+  nav.links a::after{
+    content:"";
+    position:absolute;left:0;bottom:-2px;
+    width:0%;height:1.5px;
+    background:linear-gradient(90deg,var(--lilac),var(--periwinkle));
+    transition:width .3s ease;
+  }
+  nav.links a:hover{color:var(--ink);}
+  nav.links a:hover::after{width:100%;}
+
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:11px 24px;
+    border-radius:999px;
+    font-size:14px;
+    font-weight:500;
+    letter-spacing:0.01em;
+    position:relative;
+    transition:transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .25s ease;
+  }
+  .btn-primary{
+    background:var(--wax-grad);
+    color:#fff;
+    box-shadow:var(--shadow-soft);
+  }
+  .btn-primary:hover{box-shadow:var(--shadow);}
+  .btn-primary:active{transform:scale(0.94);}
+  .btn-ghost{
+    border:1px solid var(--line);
+    color:var(--ink-soft);
+    background:var(--surface);
+  }
+  .btn-ghost:hover{border-color:var(--lilac); color:var(--ink);}
+  .btn-ghost:active{transform:scale(0.95);}
+
+  .btn.stamped::before{
+    content:"";
+    position:absolute;inset:-6px;
+    border-radius:inherit;
+    border:1.5px solid var(--lilac);
+    opacity:0;
+    animation: stampRipple .55s ease-out;
+  }
+  @keyframes stampRipple{
+    0%{opacity:0.9; transform:scale(0.85);}
+    100%{opacity:0; transform:scale(1.5);}
+  }
+
+  .nav-toggle{display:none;}
+
+  /* ---------- hero ---------- */
+  .hero{
+    position:relative;
+    min-height:100svh;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;
+    padding:120px 24px 80px;
+    z-index:1;
+  }
+  .hero .eyebrow{
+    font-size:12.5px;
+    letter-spacing:0.22em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin-bottom:26px;
+    opacity:0;
+    animation: riseIn .8s ease forwards .1s;
+  }
+  .hero-seal-wrap{
+    width:150px;height:150px;
+    margin-bottom:34px;
+    opacity:0;
+    transform:translateY(14px) scale(0.9);
+    animation: sealDrop 1.1s cubic-bezier(.22,1,.36,1) forwards .15s;
+  }
+  @keyframes sealDrop{
+    0%{opacity:0; transform:translateY(-10px) scale(0.6) rotate(-8deg);}
+    55%{opacity:1; transform:translateY(4px) scale(1.06) rotate(2deg);}
+    75%{transform:translateY(-2px) scale(0.98) rotate(-1deg);}
+    100%{opacity:1; transform:translateY(0) scale(1) rotate(0deg);}
+  }
+  .hero-seal-wrap .seal{width:100%;height:100%;}
+
+  .hero h1{
+    font-size:clamp(38px, 6vw, 68px);
+    line-height:1.06;
+    max-width:16ch;
+    opacity:0;
+    animation: riseIn .9s ease forwards .3s;
+  }
+  .hero h1 em{
+    font-style:italic;
+    background:var(--wax-grad);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+  .hero p.sub{
+    margin-top:22px;
+    font-size:17px;
+    line-height:1.6;
+    color:var(--ink-soft);
+    max-width:44ch;
+    opacity:0;
+    animation: riseIn .9s ease forwards .48s;
+  }
+  .hero .cta-row{
+    margin-top:38px;
+    display:flex;gap:14px;flex-wrap:wrap;justify-content:center;
+    opacity:0;
+    animation: riseIn .9s ease forwards .64s;
+  }
+  @keyframes riseIn{
+    from{opacity:0; transform:translateY(16px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+
+  .sparkle{
+    position:absolute;
+    color:var(--lilac);
+    opacity:0.7;
+    animation: twinkle 3.2s ease-in-out infinite;
+    pointer-events:none;
+  }
+  @keyframes twinkle{
+    0%,100%{opacity:0.15; transform:scale(0.7) rotate(0deg);}
+    50%{opacity:0.9; transform:scale(1.05) rotate(12deg);}
+  }
+
+  .scroll-cue{
+    position:absolute;bottom:34px;left:50%;transform:translateX(-50%);
+    display:flex;flex-direction:column;align-items:center;gap:8px;
+    color:var(--muted);
+    font-size:11px;letter-spacing:0.16em;text-transform:uppercase;
+    animation: floatY 2.6s ease-in-out infinite;
+  }
+  @keyframes floatY{
+    0%,100%{transform:translate(-50%,0);}
+    50%{transform:translate(-50%,8px);}
+  }
+  .scroll-cue .line{width:1px;height:28px;background:linear-gradient(var(--lilac),transparent);}
+
+  /* ---------- reveal-on-scroll ---------- */
+  .reveal{
+    opacity:0;
+    transform:translateY(26px);
+    transition:opacity .8s cubic-bezier(.22,1,.36,1), transform .8s cubic-bezier(.22,1,.36,1);
+  }
+  .reveal.in-view{opacity:1;transform:translateY(0);}
+  .reveal-stagger.in-view .stagger-item{opacity:1;transform:translateY(0) scale(1);}
+  .stagger-item{
+    opacity:0;transform:translateY(18px) scale(0.98);
+    transition:opacity .6s cubic-bezier(.22,1,.36,1), transform .6s cubic-bezier(.22,1,.36,1);
+  }
+
+  section{position:relative;z-index:1;padding:120px clamp(20px,6vw,64px);}
+  .section-inner{max-width:1120px;margin:0 auto;}
+  .eyebrow-sm{
+    font-size:12px;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);
+    display:flex;align-items:center;gap:10px;margin-bottom:18px;
+  }
+  .eyebrow-sm::before{content:"";width:22px;height:1px;background:var(--lilac);}
+
+  /* ---------- about ---------- */
+  .about{background:var(--surface);border-top:1px solid var(--line-soft);border-bottom:1px solid var(--line-soft);}
+  .about .grid{
+    display:grid;grid-template-columns:1.1fr 0.9fr;gap:70px;align-items:center;
+  }
+  .about h2{font-size:clamp(28px,3.6vw,42px); line-height:1.15; max-width:14ch;}
+  .about p{margin-top:20px; color:var(--ink-soft); line-height:1.75; font-size:15.5px; max-width:48ch;}
+  .about-stats{display:flex;gap:42px;margin-top:38px;}
+  .about-stats div b{
+    font-family:'Fraunces',serif; font-size:28px; display:block;
+    background:var(--wax-grad); -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .about-stats div span{font-size:12.5px;color:var(--muted);letter-spacing:0.04em;}
+
+  .seal-orbit{
+    position:relative;
+    width:100%;aspect-ratio:1;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .seal-orbit .ring{
+    position:absolute;border-radius:50%;
+    border:1px dashed var(--line);
+  }
+  .ring-1{inset:0;}
+  .ring-2{inset:14%;}
+  .seal-orbit .center-seal{width:46%;height:46%;position:relative;z-index:2;}
+  .orbit-node{
+    position:absolute;width:34px;height:34px;border-radius:50%;
+    background:var(--surface);border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;
+    font-size:13px;color:var(--lilac);
+    box-shadow:var(--shadow-soft);
+    animation: orbitSpin 18s linear infinite;
+  }
+  .orbit-node:nth-child(3){animation-delay:-4.5s;}
+  .orbit-node:nth-child(4){animation-delay:-9s;}
+  .orbit-node:nth-child(5){animation-delay:-13.5s;}
+  @keyframes orbitSpin{
+    from{transform:rotate(0deg) translateX(150px) rotate(0deg);}
+    to{transform:rotate(360deg) translateX(150px) rotate(-360deg);}
+  }
+
+  /* ---------- users ---------- */
+  .users{background:var(--bg);}
+  .users-head{display:flex; justify-content:space-between; align-items:flex-end; gap:24px; flex-wrap:wrap; margin-bottom:52px;}
+  .users-head h2{font-size:clamp(28px,3.6vw,42px);}
+  .users-head p{color:var(--muted); font-size:14.5px; max-width:36ch;}
+
+  .user-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:22px;
+  }
+  .user-card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:26px;
+    position:relative;
+    overflow:hidden;
+    transition:transform .35s cubic-bezier(.22,1,.36,1), box-shadow .35s ease, border-color .35s ease;
+  }
+  .user-card:hover{
+    transform:translateY(-6px);
+    box-shadow:var(--shadow);
+    border-color:var(--lilac-soft);
+  }
+  .user-card .avatar{
+    width:50px;height:50px;border-radius:50%;
+    background:var(--wax-grad);
+    display:flex;align-items:center;justify-content:center;
+    color:#fff;font-family:'Fraunces',serif;font-style:italic;font-size:18px;
+    margin-bottom:18px;
+  }
+  .user-card h3{font-size:17px;font-weight:500;}
+  .user-card .role{font-size:12.5px;color:var(--muted);margin-top:2px;}
+  .badge{
+    position:absolute;top:22px;right:22px;
+    display:flex;align-items:center;gap:6px;
+    font-size:11px;color:var(--lilac);
+    opacity:0;
+    transform:scale(0.7) rotate(-15deg);
+    transition:opacity .4s ease, transform .4s cubic-bezier(.34,1.56,.64,1);
+  }
+  .user-card:hover .badge{opacity:1;transform:scale(1) rotate(0deg);}
+  .badge svg{width:16px;height:16px;}
+  .user-card p.desc{margin-top:14px;font-size:13.5px;line-height:1.6;color:var(--ink-soft);}
+
+  /* ---------- contact ---------- */
+  .contact{background:var(--surface); border-top:1px solid var(--line-soft);}
+  .contact .grid{display:grid;grid-template-columns:0.85fr 1.15fr; gap:70px;}
+  .contact h2{font-size:clamp(28px,3.6vw,42px);}
+  .contact p.lead{margin-top:16px;color:var(--ink-soft);line-height:1.7;font-size:15px;max-width:38ch;}
+  .contact-info{margin-top:32px;display:flex;flex-direction:column;gap:14px;}
+  .contact-info a{font-size:14.5px;color:var(--ink-soft);display:flex;align-items:center;gap:10px;transition:color .2s ease;}
+  .contact-info a:hover{color:var(--lilac);}
+
+  .field{margin-bottom:20px;}
+  .field label{display:block;font-size:12.5px;color:var(--muted);margin-bottom:8px;letter-spacing:0.03em;}
+  .field input, .field textarea{
+    width:100%;
+    padding:13px 16px;
+    border-radius:12px;
+    border:1px solid var(--line);
+    background:var(--bg);
+    font-family:inherit;font-size:14.5px;color:var(--ink);
+    transition:border-color .25s ease, box-shadow .25s ease;
+  }
+  .field textarea{resize:vertical;min-height:100px;}
+  .field input:focus, .field textarea:focus{
+    outline:none;border-color:var(--lilac);
+    box-shadow:0 0 0 4px var(--lilac-soft);
+  }
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+
+  /* ---------- footer ---------- */
+  footer{
+    padding:50px clamp(20px,6vw,64px) 40px;
+    display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;
+    border-top:1px solid var(--line-soft);
+    font-size:13px;color:var(--muted);
+    position:relative;z-index:1;
+  }
+  footer .brand{opacity:0.9;}
+
+  /* ---------- modal (login) ---------- */
+  .modal-overlay{
+    position:fixed;inset:0;z-index:200;
+    background:rgba(43,42,61,0.35);
+    backdrop-filter:blur(6px);
+    display:flex;align-items:center;justify-content:center;
+    opacity:0; pointer-events:none;
+    transition:opacity .3s ease;
+    padding:24px;
+  }
+  .modal-overlay.active{opacity:1;pointer-events:auto;}
+  .modal{
+    background:var(--surface);
+    border-radius:26px;
+    padding:44px 40px;
+    width:100%;max-width:400px;
+    box-shadow:0 40px 90px -30px rgba(43,42,61,0.4);
+    text-align:center;
+    transform:scale(0.85) translateY(20px);
+    opacity:0;
+    transition:transform .45s cubic-bezier(.34,1.56,.64,1), opacity .35s ease;
+  }
+  .modal-overlay.active .modal{transform:scale(1) translateY(0); opacity:1;}
+  .modal .seal{width:56px;height:56px;margin:0 auto 18px;}
+  .modal h3{font-size:23px;}
+  .modal p.hint{color:var(--muted);font-size:13.5px;margin-top:8px;margin-bottom:26px;}
+  .modal .field{text-align:left;}
+  .modal .btn-primary{width:100%;justify-content:center;margin-top:6px;}
+  .modal-close{
+    position:absolute;top:18px;right:18px;
+    width:32px;height:32px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    color:var(--muted); font-size:16px;
+    transition:background .2s ease, color .2s ease;
+  }
+  .modal-close:hover{background:var(--line-soft); color:var(--ink);}
+  .modal-foot{margin-top:20px;font-size:13px;color:var(--muted);}
+  .modal-foot a{color:var(--lilac); font-weight:500;}
+
+  /* ---------- responsive ---------- */
+  @media (max-width:860px){
+    nav.links{
+      position:fixed; top:64px; left:16px; right:16px;
+      background:var(--surface); border:1px solid var(--line);
+      border-radius:18px; flex-direction:column; align-items:flex-start;
+      padding:20px 22px; gap:16px;
+      box-shadow:var(--shadow);
+      transform:translateY(-12px); opacity:0; pointer-events:none;
+      transition:transform .3s ease, opacity .3s ease;
+    }
+    nav.links.open{transform:translateY(0); opacity:1; pointer-events:auto;}
+    .nav-toggle{
+      display:flex;flex-direction:column;gap:5px;
+      width:26px;
+    }
+    .nav-toggle span{height:1.5px;background:var(--ink); border-radius:2px; transition:transform .3s ease, opacity .3s ease;}
+    .nav-cta{display:none;}
+    .about .grid, .contact .grid{grid-template-columns:1fr; gap:40px;}
+    .user-grid{grid-template-columns:1fr;}
+    .field-row{grid-template-columns:1fr;}
+    .seal-orbit{max-width:280px;margin:0 auto;}
+  }
+</style>
+</head>
+<body>
+
+<!-- shared SVG defs -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <linearGradient id="waxGradNav" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#c9a3dd"/>
+      <stop offset="55%" stop-color="#a29bda"/>
+      <stop offset="100%" stop-color="#7fa2d9"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<!-- reusable seal template (cloned via innerHTML in JS for consistency isn't needed; just repeat markup) -->
+
+<header class="nav" id="siteNav">
+  <a href="#home" class="brand">
+    <span class="seal" aria-hidden="true">
+      <svg viewBox="0 0 100 100">
+        <path class="seal-edge" d="M50 4 L61 9 L72 6 L80 15 L92 18 L92 30 L98 40 L91 50 L98 60 L92 70 L92 82 L80 85 L72 94 L61 91 L50 96 L39 91 L28 94 L20 85 L8 82 L8 70 L2 60 L9 50 L2 40 L8 30 L8 18 L20 15 L28 6 L39 9 Z"/>
+        <circle class="seal-face" cx="50" cy="50" r="34"/>
+        <circle class="seal-ring" cx="50" cy="50" r="30"/>
+        <text x="50" y="59" text-anchor="middle" class="seal-letters" font-size="30" fill="url(#waxGradNav)">tf</text>
+      </svg>
+    </span>
+    <span class="brand-word">TRUEFILE</span>
+  </a>
+
+  <nav class="links" id="navLinks">
+    <a href="#home">Home</a>
+    <a href="#about">About</a>
+    <a href="/user-login/">Users</a>
+    <a href="/contact/">Contact</a>
+    <a href="/chart/">True AI</a>
+  </nav>
+
+  <div style="display:flex;align-items:center;gap:14px;">
+    <a href="/admin-login/"><button class="btn btn-primary nav-cta">Login</button></a>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<main>
+
+  <!-- HOME -->
+  <section class="hero" id="home">
+    <span class="sparkle" style="top:18%; left:12%; font-size:22px;">✦</span>
+    <span class="sparkle" style="top:30%; right:10%; font-size:16px; animation-delay:.8s;">✦</span>
+    <span class="sparkle" style="bottom:22%; left:20%; font-size:14px; animation-delay:1.6s;">✦</span>
+    <span class="sparkle" style="bottom:30%; right:16%; font-size:20px; animation-delay:2.2s;">✦</span>
+
+    <p class="eyebrow">Document verification, sealed</p>
+
+    <div class="hero-seal-wrap">
+      <span class="seal" style="--size:150px;">
+        <svg viewBox="0 0 100 100">
+          <path class="seal-edge" d="M50 4 L61 9 L72 6 L80 15 L92 18 L92 30 L98 40 L91 50 L98 60 L92 70 L92 82 L80 85 L72 94 L61 91 L50 96 L39 91 L28 94 L20 85 L8 82 L8 70 L2 60 L9 50 L2 40 L8 30 L8 18 L20 15 L28 6 L39 9 Z"/>
+          <circle class="seal-face" cx="50" cy="50" r="34"/>
+          <circle class="seal-ring" cx="50" cy="50" r="30"/>
+          <text x="50" y="59" text-anchor="middle" class="seal-letters" font-size="30" fill="url(#waxGradNav)">tf</text>
+        </svg>
+      </span>
+    </div>
+
+    <h1>Every file, <em class="script">verified</em> true.</h1>
+    <p class="sub">TRUEFILE securely records document fingerprints and verifies their authenticity using SHA-256 hashing,Users can store documents in a TRUEWALLET and private blockchain technology.</p>
+
+    <div class="cta-row">
+      <button class="btn btn-primary" id="verifyBtn">Verify a file</button>
+      <a href="#about" class="btn btn-ghost">See how it works</a>
+    </div>
+
+    <div class="scroll-cue">
+      <span>Scroll</span>
+      <span class="line"></span>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="about" id="about">
+    <div class="section-inner grid">
+      <div class="reveal">
+        <div class="eyebrow-sm">About Truefile</div>
+        <h2>A wax seal for the digital age.</h2>
+        <P>TRUEFILE is a private blockchain-based document verification system that helps users verify whether a digital document is original or tampered.</P>
+        <p>Original documents are securely fingerprinted using SHA-256 hashing and recorded in a private blockchain ledger. Users can upload their documents and instantly compare them with the stored blockchain record..</p>
+        <P>Secure. Simple. Trusted.</P>
+        <div class="about-stats">
+          <div><b>100+</b><span>Files sealed</span></div>
+          <div><b>99.98%</b><span>Verification uptime</span></div>
+          <div><b>1</b><span>Countries served</span></div>
+        </div>
+      </div>
+
+      <div class="reveal">
+        <div class="seal-orbit">
+          <div class="ring ring-1"></div>
+          <div class="ring ring-2"></div>
+          <span class="seal center-seal">
+            <svg viewBox="0 0 100 100">
+              <path class="seal-edge" d="M50 4 L61 9 L72 6 L80 15 L92 18 L92 30 L98 40 L91 50 L98 60 L92 70 L92 82 L80 85 L72 94 L61 91 L50 96 L39 91 L28 94 L20 85 L8 82 L8 70 L2 60 L9 50 L2 40 L8 30 L8 18 L20 15 L28 6 L39 9 Z"/>
+              <circle class="seal-face" cx="50" cy="50" r="34"/>
+              <circle class="seal-ring" cx="50" cy="50" r="30"/>
+              <text x="50" y="59" text-anchor="middle" class="seal-letters" font-size="30" fill="url(#waxGradNav)">tf</text>
+            </svg>
+          </span>
+          <div class="orbit-node" style="top:50%; left:50%; margin:-17px;">📄</div>
+          <div class="orbit-node" style="top:50%; left:50%; margin:-17px;">🔒</div>
+          <div class="orbit-node" style="top:50%; left:50%; margin:-17px;">✓</div>
+          <div class="orbit-node" style="top:50%; left:50%; margin:-17px;">🕓</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- USERS -->
+  <section class="users" id="users">
+    <div class="section-inner">
+      <div class="users-head reveal">
+        <div>
+          <div class="eyebrow-sm">Trusted by teams</div>
+          <h2>Who's sealing files today</h2>
+        </div>
+        <p>"Every documents has a story.TRUEFILE makes its authenticity easy to verify."</p>
+      </div>
+
+      <div class="user-grid reveal-stagger">
+        <div class="user-card stagger-item">
+          <div class="badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+            Sealed
+          </div>
+          <div class="avatar">SH</div>
+          <h3>Secure Hashing</h3>
+          <div class="role">Legal · Contracts</div>
+          <p class="desc">Every original document receives a unique SHA-256 digital fingerprint.</p>
+        </div>
+
+        <div class="user-card stagger-item">
+          <div class="badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+            Sealed
+          </div>
+          <div class="avatar">PB</div>
+          <h3>Private Blockchain &
+            TrueWallet
+          </h3>
+          <div class="role">Records · Compliance</div>
+          <p class="desc">Verification records are maintained in a secured private blockchain ledger.<br>
+          TRUEFILE provides a TRUEWALLET-like secure storage module for verfied documents.</p>
+        </div>
+
+        <div class="user-card stagger-item">
+          <div class="badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+            Sealed
+          </div>
+          <div class="avatar">IV</div>
+          <h3>Instant Verfication</h3>
+          <div class="role">Admin· Verification</div>
+          <p class="desc">Upload a document and admin can check whether it matches the trusted original record.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <span class="brand-word display" style="font-size:14px;">TRUEFILE</span>
+  <span>© 2026 Truefile. Every file, verified true.</span>
+</footer>
+
+<!-- LOGIN MODAL -->
+<div class="modal-overlay" id="loginModal">
+  <div class="modal">
+    <button class="modal-close" id="modalClose">✕</button>
+    <span class="seal">
+      <svg viewBox="0 0 100 100">
+        <path class="seal-edge" d="M50 4 L61 9 L72 6 L80 15 L92 18 L92 30 L98 40 L91 50 L98 60 L92 70 L92 82 L80 85 L72 94 L61 91 L50 96 L39 91 L28 94 L20 85 L8 82 L8 70 L2 60 L9 50 L2 40 L8 30 L8 18 L20 15 L28 6 L39 9 Z"/>
+        <circle class="seal-face" cx="50" cy="50" r="34"/>
+        <circle class="seal-ring" cx="50" cy="50" r="30"/>
+        <text x="50" y="59" text-anchor="middle" class="seal-letters" font-size="30" fill="url(#waxGradNav)">tf</text>
+      </svg>
+    </span>
+    <h3>Welcome back</h3>
+    <p class="hint">Log in to view and manage your sealed files.</p>
+    <form id="loginForm">
+      <div class="field">
+        <label for="loginEmail">Email</label>
+        <input id="loginEmail" type="email" placeholder="you@company.com" required>
+      </div>
+      <div class="field">
+        <label for="loginPass">Password</label>
+        <input id="loginPass" type="password" placeholder="••••••••" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Log in</button>
+    </form>
+    <div class="modal-foot">New to Truefile? <a href="#">Create an account</a></div>
+  </div>
+</div>
+
+<script>
+  // nav scroll state
+  const nav = document.getElementById('siteNav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 30);
+  }, { passive:true });
+
+  // mobile nav toggle
+  const navToggle = document.getElementById('navToggle');
+  const navLinks = document.getElementById('navLinks');
+  navToggle.addEventListener('click', () => {
+    navLinks.classList.toggle('open');
+    navToggle.classList.toggle('active');
+  });
+  navLinks.querySelectorAll('a').forEach(a => a.addEventListener('click', () => navLinks.classList.remove('open')));
+
+  // scroll reveal
+  const revealEls = document.querySelectorAll('.reveal, .reveal-stagger');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in-view');
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.18 });
+  revealEls.forEach(el => io.observe(el));
+
+  // stamp / press ripple on buttons
+  document.querySelectorAll('.btn-primary').forEach(btn => {
+    btn.addEventListener('click', () => {
+      btn.classList.remove('stamped');
+      void btn.offsetWidth; // reflow to restart animation
+      btn.classList.add('stamped');
+    });
+  });
+
+  // login modal
+  const loginModal = document.getElementById('loginModal');
+  const openLogin = () => loginModal.classList.add('active');
+  const closeLogin = () => loginModal.classList.remove('active');
+  document.getElementById('loginBtn').addEventListener('click', openLogin);
+  document.getElementById('loginBtnMobile').addEventListener('click', (e) => { e.preventDefault(); openLogin(); navLinks.classList.remove('open'); });
+  document.getElementById('modalClose').addEventListener('click', closeLogin);
+  loginModal.addEventListener('click', (e) => { if (e.target === loginModal) closeLogin(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLogin(); });
+
+  document.getElementById('loginForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    closeLogin();
+  });
+
+  document.getElementById('verifyBtn').addEventListener('click', () => {
+    document.getElementById('contact').scrollIntoView({ behavior: 'smooth' });
+  });
+
+</script>
+
+</body>
+</html>

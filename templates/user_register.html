@@ -1,0 +1,419 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>TRUEFILE - User Registration</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+:root{
+    --navy:#1E3A8A;
+    --violet:#6A11CB;
+    --blue:#2563EB;
+    --red:#DC2626;
+    --green:#16A34A;
+    --ink:#1f2333;
+    --muted:#6b7280;
+    --line:#e7e8f2;
+    --surface:rgba(255,255,255,0.92);
+    --shadow: 0 24px 60px -24px rgba(30,20,80,0.35);
+}
+
+*{ margin:0; padding:0; box-sizing:border-box; }
+
+body{
+    font-family:'Outfit', Arial, sans-serif;
+    color:var(--ink);
+    min-height:100vh;
+    overflow-x:hidden;
+    position:relative;
+}
+
+h1,h2,.display{ font-family:'Fraunces', serif; font-weight:600; }
+a{ color:inherit; text-decoration:none; }
+button{ font-family:inherit; cursor:pointer; }
+
+@media (prefers-reduced-motion: reduce){
+    *{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; }
+}
+
+/* ---------------- animated gradient background ---------------- */
+#bgCanvas{ position:fixed; inset:0; width:100%; height:100%; z-index:-2; filter:blur(70px) saturate(1.25); }
+.grain{
+    position:fixed; inset:0; z-index:-1; pointer-events:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+    mix-blend-mode:overlay;
+}
+
+/* ---------------- topbar ---------------- */
+.topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:22px clamp(20px,4vw,50px);
+    opacity:0; animation:fadeDown .7s cubic-bezier(.22,1,.36,1) forwards;
+}
+@keyframes fadeDown{ from{opacity:0; transform:translateY(-16px);} to{opacity:1; transform:translateY(0);} }
+.brand{ display:flex; align-items:center; gap:12px; }
+.brand .mark{
+    width:42px;height:42px;border-radius:12px;
+    background:linear-gradient(135deg,var(--navy),var(--violet));
+    display:flex;align-items:center;justify-content:center;
+    color:#fff; font-family:'Fraunces',serif; font-style:italic; font-weight:600; font-size:18px;
+    box-shadow:0 10px 22px -8px rgba(106,17,203,0.55);
+}
+.brand h1{ font-size:20px; color:#fff; }
+.brand .sub{ font-size:12px; color:rgba(255,255,255,0.7); margin-top:1px; }
+.back-link{
+    display:flex; align-items:center; gap:8px;
+    color:rgba(255,255,255,0.85); font-size:13.5px;
+    background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.25);
+    padding:9px 16px; border-radius:999px; backdrop-filter:blur(10px);
+    transition:background .2s ease, transform .2s ease;
+}
+.back-link:hover{ background:rgba(255,255,255,0.2); transform:translateX(-3px); }
+
+.stage{
+    position:relative; z-index:1;
+    min-height:calc(100vh - 90px);
+    display:flex; align-items:center; justify-content:center;
+    padding:30px 24px 60px;
+}
+
+/* ---------------- card ---------------- */
+.card{
+    width:100%; max-width:460px;
+    background:var(--surface); backdrop-filter:blur(16px);
+    border:1px solid rgba(255,255,255,0.7);
+    border-radius:26px; padding:44px 40px 36px;
+    box-shadow:var(--shadow);
+    text-align:center;
+    opacity:0; transform:translateY(26px) scale(0.97);
+    animation:cardRise .8s cubic-bezier(.22,1,.36,1) forwards .1s;
+}
+@keyframes cardRise{ to{opacity:1; transform:translateY(0) scale(1);} }
+
+.seal-badge{
+    width:78px;height:78px;border-radius:50%;
+    background:linear-gradient(135deg,var(--navy),var(--violet));
+    display:flex;align-items:center;justify-content:center;
+    margin:0 auto 16px;
+    box-shadow:0 16px 30px -12px rgba(106,17,203,0.5);
+    animation:gentleFloat 3.4s ease-in-out infinite;
+}
+@keyframes gentleFloat{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-8px); } }
+.seal-badge svg{ width:30px;height:30px; color:#fff; }
+
+h1.title{ font-size:23px; margin-bottom:6px; }
+p.subtitle{ font-size:13.5px; color:var(--muted); margin-bottom:24px; }
+
+/* ---------------- error banner ---------------- */
+.error{
+    background:#fdecec; color:#b91c1c;
+    border:1px solid #f2d3d3;
+    border-radius:12px; padding:11px 14px;
+    font-size:13px; text-align:left; margin-bottom:18px;
+    display:flex; align-items:center; gap:9px;
+    animation:errorIn .35s cubic-bezier(.22,1,.36,1);
+}
+@keyframes errorIn{ from{opacity:0; transform:translateY(-6px);} to{opacity:1; transform:translateY(0);} }
+.error svg{ width:16px;height:16px; flex-shrink:0; }
+
+/* ---------------- fields, staggered entrance ---------------- */
+.field{
+    text-align:left; margin-bottom:14px; position:relative;
+    opacity:0; transform:translateY(14px);
+    animation:fieldIn .5s cubic-bezier(.22,1,.36,1) forwards;
+}
+@keyframes fieldIn{ to{ opacity:1; transform:translateY(0); } }
+.field:nth-child(1){ animation-delay:.12s; }
+.field:nth-child(2){ animation-delay:.18s; }
+.field:nth-child(3){ animation-delay:.24s; }
+.field:nth-child(4){ animation-delay:.30s; }
+.field:nth-child(5){ animation-delay:.36s; }
+.field:nth-child(6){ animation-delay:.42s; }
+
+.field label{ display:block; font-size:12px; color:var(--muted); margin-bottom:7px; letter-spacing:0.03em; }
+.input-wrap{ position:relative; }
+.input-wrap svg.icon{ position:absolute; left:14px; top:50%; transform:translateY(-50%); width:16px;height:16px; color:var(--muted); transition:color .25s ease; }
+.field input{
+    width:100%; padding:13px 14px 13px 40px; border-radius:13px;
+    border:1.5px solid var(--line); background:#fff;
+    font-family:inherit; font-size:14.5px; color:var(--ink);
+    transition:border-color .25s ease, box-shadow .25s ease;
+}
+.field input:focus{ outline:none; border-color:var(--violet); box-shadow:0 0 0 4px rgba(106,17,203,0.12); }
+.input-wrap:focus-within svg.icon{ color:var(--violet); }
+
+.toggle-pass{
+    position:absolute; right:12px; top:50%; transform:translateY(-50%);
+    color:var(--muted); font-size:12px; padding:4px 6px; border:none; background:none;
+    transition:color .2s ease;
+}
+.toggle-pass:hover{ color:var(--ink); }
+
+.strength-track{ height:4px; border-radius:99px; background:var(--line); overflow:hidden; margin-top:8px; }
+.strength-fill{ height:100%; width:0%; border-radius:99px; background:linear-gradient(90deg,var(--navy),var(--violet)); transition:width .3s ease, background .3s ease; }
+.strength-label{ font-size:11px; color:var(--muted); margin-top:5px; display:block; text-align:left; }
+
+.match-hint{ font-size:11px; margin-top:6px; text-align:left; display:none; align-items:center; gap:5px; }
+.match-hint.show{ display:flex; }
+.match-hint.ok{ color:var(--green); }
+.match-hint.bad{ color:var(--red); }
+.match-hint svg{ width:12px;height:12px; }
+
+/* ---------------- submit button ---------------- */
+.btn-register{
+    width:100%; padding:15px; border-radius:13px; margin-top:8px;
+    background:linear-gradient(135deg,var(--navy),var(--violet));
+    color:#fff; font-size:15px; font-weight:600;
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    position:relative;
+    box-shadow:0 16px 32px -14px rgba(106,17,203,0.5);
+    transition:transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .25s ease;
+    border:none;
+    opacity:0; transform:translateY(14px);
+    animation:fieldIn .5s cubic-bezier(.22,1,.36,1) forwards .48s;
+}
+.btn-register:hover{ box-shadow:0 20px 40px -14px rgba(106,17,203,0.65); }
+.btn-register:active{ transform:scale(0.97); }
+.btn-register.loading{ pointer-events:none; }
+.btn-register .label{ transition:opacity .2s ease; }
+.btn-register.loading .label{ opacity:0; }
+
+.spinner{
+    position:absolute; width:18px;height:18px;border-radius:50%;
+    border:2.5px solid rgba(255,255,255,0.35); border-top-color:#fff;
+    opacity:0; transform:scale(0.6);
+    transition:opacity .2s ease, transform .2s ease;
+}
+.btn-register.loading .spinner{ opacity:1; transform:scale(1); animation:spin .7s linear infinite; }
+@keyframes spin{ to{ transform:rotate(360deg) scale(1); } }
+
+.swap-hint{
+    font-size:13px; color:var(--muted); margin-top:20px;
+    opacity:0; animation:fieldIn .5s cubic-bezier(.22,1,.36,1) forwards .54s;
+}
+.swap-hint a{ color:var(--violet); font-weight:600; }
+.swap-hint a:hover{ opacity:0.75; }
+
+@media (max-width:460px){
+    .card{ padding:36px 26px 30px; border-radius:22px; }
+}
+
+</style>
+</head>
+
+<body>
+
+<canvas id="bgCanvas"></canvas>
+<div class="grain"></div>
+
+<div class="topbar">
+    <div class="brand">
+        <span class="mark">tf</span>
+        <div>
+            <h1>TRUEFILE</h1>
+            <div class="sub">User Registration</div>
+        </div>
+    </div>
+    <a href="{% url 'home' %}" class="back-link">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Back to Truefile
+    </a>
+</div>
+
+<div class="stage">
+    <div class="card">
+
+        <div class="seal-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/></svg>
+        </div>
+
+        <h1 class="title">User Registration</h1>
+        <p class="subtitle">Create your account to start sealing and verifying documents.</p>
+
+        {% if error %}
+        <div class="error">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16h.01"/></svg>
+            {{ error }}
+        </div>
+        {% endif %}
+
+        <form method="POST" action="{% url 'user_register' %}" id="registerForm" novalidate>
+            {% csrf_token %}
+
+            <div class="field">
+                <label for="fullname">Full Name</label>
+                <div class="input-wrap">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/></svg>
+                    <input id="fullname" name="name" type="text" placeholder="Full Name" value="{{ request.POST.name|default:'' }}" autocomplete="name" required>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="email">Email Address</label>
+                <div class="input-wrap">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+                    <input id="email" name="email" type="email" placeholder="Email Address" value="{{ request.POST.email|default:'' }}" autocomplete="email" required>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="phone">Phone Number</label>
+                <div class="input-wrap">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.1-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .3 2 .7 3a2 2 0 0 1-.4 2.1L8.1 10a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2-.5c1 .4 2 .6 3 .7a2 2 0 0 1 1.6 2Z"/></svg>
+                    <input id="phone" name="phone" type="tel" placeholder="Phone Number" value="{{ request.POST.phone|default:'' }}" autocomplete="tel" required>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="username">Username</label>
+                <div class="input-wrap">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20c4-1 7-4 7-9V6l-7-3-7 3v5c0 5 3 8 7 9Z"/></svg>
+                    <input id="username" name="username" type="text" placeholder="Username" value="{{ request.POST.username|default:'' }}" autocomplete="username" required>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="password">Password</label>
+                <div class="input-wrap">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+                    <input id="password" name="password" type="password" placeholder="Password" autocomplete="new-password" required style="padding-right:56px;">
+                    <button type="button" class="toggle-pass" data-target="password">Show</button>
+                </div>
+                <div class="strength-track"><div class="strength-fill" id="strengthFill"></div></div>
+                <span class="strength-label" id="strengthLabel">Use 8+ characters with a mix of letters & numbers</span>
+            </div>
+
+            <div class="field">
+                <label for="confirmPassword">Confirm Password</label>
+                <div class="input-wrap">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+                    <input id="confirmPassword" name="password2" type="password" placeholder="Confirm Password" autocomplete="new-password" required style="padding-right:56px;">
+                    <button type="button" class="toggle-pass" data-target="confirmPassword">Show</button>
+                </div>
+                <div class="match-hint" id="matchHint">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>
+                    <span id="matchText">Passwords match</span>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-register" id="registerBtn">
+                <span class="label">Register</span>
+                <span class="spinner"></span>
+            </button>
+        </form>
+
+        <p class="swap-hint">Already have an account? <a href="{% url 'user_login' %}">Login</a></p>
+    </div>
+</div>
+
+<script>
+// ---------------- animated gradient background ----------------
+const canvas = document.getElementById('bgCanvas');
+const ctx = canvas.getContext('2d');
+let w, h, dpr;
+function resize(){
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    w = window.innerWidth; h = window.innerHeight;
+    canvas.width = w * dpr; canvas.height = h * dpr;
+    canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+resize();
+window.addEventListener('resize', resize);
+const palette = ['#1E3A8A', '#6A11CB', '#2563EB', '#8B5CF6', '#1e293b'];
+const blobs = Array.from({length:6}).map((_,i) => ({
+    x: Math.random()*w, y: Math.random()*h,
+    r: 180 + Math.random()*240,
+    color: palette[i % palette.length],
+    vx: (Math.random()-0.5)*0.22, vy: (Math.random()-0.5)*0.22,
+    phase: Math.random()*Math.PI*2
+}));
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function draw(t){
+    ctx.fillStyle = '#eef1f7';
+    ctx.fillRect(0,0,w,h);
+    blobs.forEach(b => {
+        if(!reducedMotion){
+            b.x += b.vx; b.y += b.vy;
+            if (b.x < -b.r) b.x = w + b.r;
+            if (b.x > w + b.r) b.x = -b.r;
+            if (b.y < -b.r) b.y = h + b.r;
+            if (b.y > h + b.r) b.y = -b.r;
+        }
+        const pulse = reducedMotion ? 1 : 1 + Math.sin(t/1900 + b.phase) * 0.07;
+        const grad = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.r*pulse);
+        grad.addColorStop(0, b.color + '55');
+        grad.addColorStop(1, b.color + '00');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, b.r*pulse, 0, Math.PI*2);
+        ctx.fill();
+    });
+    if (!reducedMotion) requestAnimationFrame(draw);
+}
+requestAnimationFrame(draw);
+
+// ---------------- toggle password visibility ----------------
+document.querySelectorAll('.toggle-pass').forEach(toggle => {
+    toggle.addEventListener('click', () => {
+        const input = document.getElementById(toggle.dataset.target);
+        const isPass = input.type === 'password';
+        input.type = isPass ? 'text' : 'password';
+        toggle.textContent = isPass ? 'Hide' : 'Show';
+    });
+});
+
+// ---------------- password strength meter ----------------
+const password = document.getElementById('password');
+const strengthFill = document.getElementById('strengthFill');
+const strengthLabel = document.getElementById('strengthLabel');
+password.addEventListener('input', () => {
+    const v = password.value;
+    let score = 0;
+    if (v.length >= 8) score++;
+    if (/[A-Z]/.test(v)) score++;
+    if (/[0-9]/.test(v)) score++;
+    if (/[^A-Za-z0-9]/.test(v)) score++;
+    const pct = [0, 25, 55, 80, 100][score];
+    const colors = ['#e7e8f2', '#e3a8a8', '#e0c27a', '#a8c98a', '#6A11CB'];
+    const labels = ['Use 8+ characters with a mix of letters & numbers', 'Weak', 'Fair', 'Good', 'Strong'];
+    strengthFill.style.width = pct + '%';
+    strengthFill.style.background = v.length ? colors[score] : 'linear-gradient(90deg,#1E3A8A,#6A11CB)';
+    strengthLabel.textContent = v.length ? labels[score] : labels[0];
+    checkMatch();
+});
+
+// ---------------- live confirm-password match check ----------------
+const confirmPassword = document.getElementById('confirmPassword');
+const matchHint = document.getElementById('matchHint');
+const matchText = document.getElementById('matchText');
+function checkMatch(){
+    if (!confirmPassword.value){ matchHint.classList.remove('show'); return; }
+    matchHint.classList.add('show');
+    if (confirmPassword.value === password.value){
+        matchHint.classList.remove('bad'); matchHint.classList.add('ok');
+        matchText.textContent = 'Passwords match';
+    } else {
+        matchHint.classList.remove('ok'); matchHint.classList.add('bad');
+        matchText.textContent = "Passwords don't match";
+    }
+}
+confirmPassword.addEventListener('input', checkMatch);
+
+// ---------------- submit animation ----------------
+const registerForm = document.getElementById('registerForm');
+const registerBtn = document.getElementById('registerBtn');
+registerForm.addEventListener('submit', () => {
+    if (registerBtn.classList.contains('loading')) return;
+    registerBtn.classList.add('loading');
+});
+</script>
+
+</body>
+</html>
