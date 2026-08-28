@@ -692,6 +692,3 @@ def admin_logout(request):
     request.session.flush()
 
     return redirect("home")
-
-    
-    
